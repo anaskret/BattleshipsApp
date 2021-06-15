@@ -1,0 +1,194 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Battleships.MobileApp.ViewModels.Game"
+             xmlns:flv="clr-namespace:DLToolkit.Forms.Controls;assembly=DLToolkit.Forms.Controls.FlowListView"
+             x:Class="Battleships.MobileApp.Views.GamePage">
+    <ContentPage.BindingContext>
+        <vm:GameViewModel/>
+    </ContentPage.BindingContext>
+    <StackLayout>
+
+        <flv:FlowListView FlowColumnCount="10" SeparatorVisibility="None" HasUnevenRows="false"
+                          SelectedItem="{Binding SelectedTile}"
+	                      FlowItemTappedCommand="{Binding ItemTappedCommand}" FlowLastTappedItem="{Binding SelectedTile}"
+	                      FlowItemsSource="{Binding Tiles}" >
+            <flv:FlowListView.Header>
+                <Label Text="Battleships" HorizontalOptions="Center"/>
+            </flv:FlowListView.Header>
+            <flv:FlowListView.FlowColumnTemplate>
+                <DataTemplate>
+                    <Frame WidthRequest="10" HeightRequest="10"
+                           BorderColor="Black" BackgroundColor="White">
+                        <Frame.Triggers>
+                            <DataTrigger TargetType="Frame" Binding="{Binding IsShip}" Value="true">
+                                <Setter Property="BackgroundColor" Value="LightBlue"/>
+                            </DataTrigger>
+                            <DataTrigger TargetType="Frame" Binding="{Binding IsHit}" Value="true">
+                                <Setter Property="BackgroundColor" Value="IndianRed"/>
+                            </DataTrigger>
+                        </Frame.Triggers>
+                        <Label Text="x" VerticalOptions="Center" HorizontalOptions="Center">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsHit}" Value="true">
+                                    <Setter Property="IsVisible" Value="true"/>
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                    </Frame>
+                </DataTemplate>
+            </flv:FlowListView.FlowColumnTemplate>
+            <flv:FlowListView.Footer>
+                <StackLayout>
+                    <Label Text="Place your ships" HorizontalOptions="Center"/>
+                    <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand" Spacing="0">
+                        <Label VerticalOptions="Center" Margin="10, 0">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="{Binding CarriersLeftCount}"/>
+                                    <Span Text="x"/>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                        <Frame WidthRequest="10" HeightRequest="10"
+                               BorderColor="Black" BackgroundColor="White">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding PlaceCarrierCommand}"/>
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                        <Frame WidthRequest="10" HeightRequest="10"
+                               BorderColor="Black" BackgroundColor="White">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding PlaceCarrierCommand}"/>
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                        <Frame WidthRequest="10" HeightRequest="10"
+                               BorderColor="Black" BackgroundColor="White">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding PlaceCarrierCommand}"/>
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                        <Frame WidthRequest="10" HeightRequest="10"
+                               BorderColor="Black" BackgroundColor="White">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding PlaceCarrierCommand}"/>
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                        <Frame WidthRequest="10" HeightRequest="10"
+                               BorderColor="Black" BackgroundColor="White">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding PlaceCarrierCommand}"/>
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand" Spacing="0">
+                        <Label VerticalOptions="Center" Margin="10, 0">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="{Binding BattleshipsLeftCount}"/>
+                                    <Span Text="x"/>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                        <Frame WidthRequest="10" HeightRequest="10"
+                               BorderColor="Black" BackgroundColor="White">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding PlaceBattleshipCommand}"/>
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                        <Frame WidthRequest="10" HeightRequest="10"
+                               BorderColor="Black" BackgroundColor="White">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding PlaceBattleshipCommand}"/>
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                        <Frame WidthRequest="10" HeightRequest="10"
+                               BorderColor="Black" BackgroundColor="White">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding PlaceBattleshipCommand}"/>
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                        <Frame WidthRequest="10" HeightRequest="10"
+                               BorderColor="Black" BackgroundColor="White">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding PlaceBattleshipCommand}"/>
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand" Spacing="0">
+                        <Label VerticalOptions="Center" Margin="10, 0">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="{Binding CruisersLeftCount}"/>
+                                    <Span Text="x"/>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                        <Frame WidthRequest="10" HeightRequest="10"
+                                   BorderColor="Black" BackgroundColor="White">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding PlaceCruiserCommand}"/>
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                        <Frame WidthRequest="10" HeightRequest="10"
+                                   BorderColor="Black" BackgroundColor="White">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding PlaceCruiserCommand}"/>
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                        <Frame WidthRequest="10" HeightRequest="10"
+                                   BorderColor="Black" BackgroundColor="White">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding PlaceCruiserCommand}"/>
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand" Spacing="0">
+                        <Label VerticalOptions="Center" Margin="10, 0">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="{Binding SubmarinesLeftCount}"/>
+                                    <Span Text="x"/>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                        <Frame WidthRequest="10" HeightRequest="10"
+                                   BorderColor="Black" BackgroundColor="White">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding PlaceSubmarineCommand}"/>
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                        <Frame WidthRequest="10" HeightRequest="10"
+                                   BorderColor="Black" BackgroundColor="White">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding PlaceSubmarineCommand}"/>
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand" Spacing="0">
+                        <Label VerticalOptions="Center" Margin="10, 0">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="{Binding DestroyersLeftCount}"/>
+                                    <Span Text="x"/>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                        <Frame WidthRequest="10" HeightRequest="10"
+                                   BorderColor="Black" BackgroundColor="White">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding PlaceDestroyerCommand}"/>
+                            </Frame.GestureRecognizers>
+                        </Frame>
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal">
+                        <Button Command="{Binding ClearCommand}" Text="Clear" HeightRequest="64" 
+                                WidthRequest="360" CornerRadius="10" BackgroundColor="DimGray" />
+                        <Button Command="{Binding ReadyCommand}" Text="Ready" IsEnabled="{Binding IsReady}" HeightRequest="64" 
+                                WidthRequest="360" CornerRadius="10" BackgroundColor="DimGray" />
+                    </StackLayout>
+                </StackLayout>
+            </flv:FlowListView.Footer>
+        </flv:FlowListView>
+    </StackLayout>
+</ContentPage>

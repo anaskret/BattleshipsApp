@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<pages:PopupPage xmlns="http://xamarin.com/schemas/2014/forms"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                 xmlns:pages="clr-namespace:Rg.Plugins.Popup.Pages;assembly=Rg.Plugins.Popup"
+                 xmlns:animations="clr-namespace:Rg.Plugins.Popup.Animations;assembly=Rg.Plugins.Popup"
+                 xmlns:vm="clr-namespace:Battleships.MobileApp.ViewModels"
+                 x:Class="Battleships.MobileApp.Views.PopupInfo">
+    <ContentPage.BindingContext>
+        <vm:PopupInfoViewModel />
+    </ContentPage.BindingContext>
+    <pages:PopupPage.Animation>
+        <animations:ScaleAnimation 
+            PositionIn="Center"
+            PositionOut="Center"
+            ScaleIn="1.2"
+            ScaleOut="0.8"
+            DurationIn="400"
+            DurationOut="300"
+            EasingIn="SinOut"
+            EasingOut="SinIn"
+            HasBackgroundAnimation="True"/>
+    </pages:PopupPage.Animation>
+    <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
+        <Frame BackgroundColor="White"
+               WidthRequest="300"
+               HeightRequest="200"
+               CornerRadius="12">
+            <StackLayout VerticalOptions="StartAndExpand"
+                         HorizontalOptions="CenterAndExpand">
+                <Label Text="{Binding Title}" FontSize="20" FontAttributes="Bold" HorizontalOptions="CenterAndExpand" Margin="30, 10, 30,  15"/>
+                <Label Text="{Binding Message}"
+                       FontSize="14"
+                       HorizontalOptions="Center" HorizontalTextAlignment="Center"
+                       Padding="30, 15, 30, 30"/>
+                <Button Text="OK" Command="{Binding ClosePopupCommand}" BackgroundColor="Gray" FontAttributes="Bold"
+                        HeightRequest="48" Margin="20, 5" CornerRadius="10"/>
+            </StackLayout>
+        </Frame>
+    </StackLayout>
+</pages:PopupPage>
