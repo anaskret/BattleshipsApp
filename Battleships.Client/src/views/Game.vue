@@ -1,10 +1,14 @@
 <template>
-    <GameMenu
-        :isOpen="isGameMenuOpen"
-        :options="gameMenuOptions"
-        @start-new-game="handleNewGame"
-        @resume-game="handleResumeGame"
-    />
+    <v-main>
+        <div>
+            <GameMenu
+                :isOpen="isGameMenuOpen"
+                :options="gameMenuOptions"
+                @start-new-game="handleNewGame"
+                @resume-game="handleResumeGame"
+            />
+        </div>
+    </v-main>
 </template>
 
 <script>
@@ -17,6 +21,7 @@ export default {
     },
     data: () => ({
         isGameMenuOpen: true,
+        isGameBoardRedactorOpen: false,
         gameHasWinner: false,
         gameMenuOptions: {
             resume: {
@@ -30,18 +35,6 @@ export default {
     methods: {
         hideGameMenu() {
             this.isGameMenuOpen = false;
-        },
-        handleShowGameMenu() {
-            this.isGameMenuOpen = true;
-        },
-        handleNewGame() {
-            this.gameHasWinner = false;
-            this.gameMenuOptions.resume.isDisabled = false;
-            this.gameMenuOptions.join.isDisabled = false;
-            this.hideGameMenu();
-        },
-        handleResumeGame() {
-            this.hideGameMenu();
         },
     },
 };
