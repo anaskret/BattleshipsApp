@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Battleships.Models.Dtos
+namespace Battleships.Services.Services.Auth
 {
-    public class ExampleDto
+    class JwtSettings
     {
-
-
+        public string Secret { get; set; }
     }
 }
