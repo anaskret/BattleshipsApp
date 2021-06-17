@@ -183,9 +183,9 @@
                     </StackLayout>
                     <StackLayout Orientation="Horizontal">
                         <Button Command="{Binding ClearCommand}" Text="Clear" HeightRequest="64" 
-                                WidthRequest="360" CornerRadius="10" BackgroundColor="DimGray" />
+                                CornerRadius="10" BackgroundColor="DimGray" />
                         <Button Command="{Binding ReadyCommand}" Text="Ready" IsEnabled="{Binding IsReady}" HeightRequest="64" 
-                                WidthRequest="360" CornerRadius="10" BackgroundColor="DimGray" />
+                                CornerRadius="10" BackgroundColor="DimGray" />
                     </StackLayout>
                 </StackLayout>
             </flv:FlowListView.Footer>

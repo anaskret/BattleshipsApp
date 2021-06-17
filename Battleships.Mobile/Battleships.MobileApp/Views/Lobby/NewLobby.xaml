@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Battleships.MobileApp.Views.NewLobby">
+    <Frame VerticalOptions="Center" HorizontalOptions="Center">
+        <StackLayout>
+            <Frame CornerRadius="10"
+                       OutlineColor="{StaticResource LoginEntryOutline}"
+                       BackgroundColor="{StaticResource LoginEntryBackground}"
+                       WidthRequest="360"
+                       HeightRequest="64"
+                       Padding="0">
+                <StackLayout VerticalOptions="Center" Orientation="Horizontal">
+                    <Entry Text="{Binding LobbyName}" Placeholder="Lobby Name"
+                           HeightRequest="64" WidthRequest="360" 
+                           HorizontalOptions="StartAndExpand"/>
+                </StackLayout>
+            </Frame>
+            <Button Text="OK" Command="{Binding ClosePopupCommand}" BackgroundColor="Gray" FontAttributes="Bold"
+                        HeightRequest="48" Margin="20, 5" CornerRadius="10"/>
+        </StackLayout>
+    </Frame>
+</ContentPage>

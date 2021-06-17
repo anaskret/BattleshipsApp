@@ -1,18 +1,30 @@
 ﻿using Battleships.MobileApp.Models;
 using Battleships.MobileApp.Models.Enums;
-using MvvmHelpers.Commands;
+using Battleships.MobileApp.ViewModels.Base;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
+using Xamarin.Forms;
 
 namespace Battleships.MobileApp.ViewModels.Game
 {
-    public class GameViewModel : BaseViewModel
+    [QueryProperty(nameof(LobbyId), nameof(LobbyId))]
+    public class GameViewModel : ViewModelBase
     {
         private ObservableCollection<TileModel> _tiles;
         public ObservableCollection<TileModel> Tiles { get => _tiles; set => SetProperty(ref _tiles, value); }
+
+        private int _lobbyId;
+        public int LobbyId
+        {
+            get => _lobbyId;
+            set
+            {
+                SetProperty(ref _lobbyId, Convert.ToInt32(Uri.UnescapeDataString(value.ToString())));
+                OnPropertyChanged();
+            }
+        }
 
         public List<ShipModel> Ships { get; set; }
 
@@ -53,12 +65,12 @@ namespace Battleships.MobileApp.ViewModels.Game
                     _selectedTile = value;
                     //Shoot()
                 }
-                if(isInPlacement && value.IsShip)
+                else if(isInPlacement && value.IsShip)
                 {
                     _selectedTile = value;
                     RotateShip();
                 }
-                if(isInPlacement)
+                else if(isInPlacement)
                 {
                     _selectedTile = value;
                     PlaceShip();
@@ -79,22 +91,34 @@ namespace Battleships.MobileApp.ViewModels.Game
 
         public GameViewModel()
         {
-            Tiles = new ObservableCollection<TileModel>();
-            Ships = new List<ShipModel>();
-
-            for (int i = 0; i < 10; i++)
-            {
-                for(int j = 0; j < 10; j++)
-                {
-                    Tiles.Add(new TileModel() { X = j, Y = i});
-                }
-            }
+            CreateTiles();
 
             PlaceCarrierCommand = new Command(PlaceCarrier);
             PlaceBattleshipCommand = new Command(PlaceBattleship);
             PlaceCruiserCommand = new Command(PlaceCruiser);
             PlaceSubmarineCommand = new Command(PlaceSubmarine);
             PlaceDestroyerCommand = new Command(PlaceDestroyer);
+            ClearCommand = new Command(CreateTiles);
+        }
+
+        private void CreateTiles()
+        {
+            Tiles = new ObservableCollection<TileModel>();
+            Ships = new List<ShipModel>();
+
+            CarriersLeftCount = 1;
+            BattleshipsLeftCount = 2;
+            CruisersLeftCount = 3;
+            SubmarinesLeftCount = 4;
+            DestroyersLeftCount = 5;
+
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                    Tiles.Add(new TileModel() { X = j, Y = i });
+                }
+            }
         }
 
         private void PlaceCarrier()
@@ -106,24 +130,31 @@ namespace Battleships.MobileApp.ViewModels.Game
         
         private void PlaceBattleship()
         {
+            if (BattleshipsLeftCount <= 0)
+                return;
             _currentShipForPlacement = ShipsEnum.Battleship;
 
         }
 
         private void PlaceCruiser()
         {
+            if (CruisersLeftCount <= 0)
+                return;
             _currentShipForPlacement = ShipsEnum.Cruiser;
-
         }
 
         private void PlaceSubmarine()
         {
+            if (SubmarinesLeftCount <= 0)
+                return;
             _currentShipForPlacement = ShipsEnum.Submarine;
 
         }
 
         private void PlaceDestroyer()
         {
+            if (DestroyersLeftCount <= 0)
+                return;
             _currentShipForPlacement = ShipsEnum.Destroyer;
 
         }
@@ -174,7 +205,7 @@ namespace Battleships.MobileApp.ViewModels.Game
                     shipSize = 3;
                     isValidForPlacement = ValidateShipXCoordinates(SelectedTile, shipSize);
 
-                    if (isValidForPlacement)
+                    if (!isValidForPlacement)
                         return;
 
                     for (int i = 0; i < shipSize; i++)
@@ -304,7 +335,7 @@ namespace Battleships.MobileApp.ViewModels.Game
             if (Tiles.Any(prp => prp.X == startTile.X + size && prp.Y == startTile.Y && prp.IsShip))
                 return false;
 
-            for (int i = 0; i < size; i++)
+            for (int i = -1; i <= size; i++)
             {
                 if (Tiles.Any(prp => prp.X == startTile.X + i && prp.Y == startTile.Y && prp.IsShip))
                     return false;
@@ -312,7 +343,7 @@ namespace Battleships.MobileApp.ViewModels.Game
                     return false;
                 if (Tiles.Any(prp => prp.X == startTile.X + i && prp.Y == startTile.Y - 1 && prp.IsShip))
                     return false;
-                if (startTile.X + i > 9)
+                if (startTile.X + i > 9 && i < size)
                     return false;
             }
 
@@ -326,7 +357,7 @@ namespace Battleships.MobileApp.ViewModels.Game
             if (Tiles.Any(prp => prp.X == startTile.X + size && prp.Y == startTile.Y && prp.IsShip))
                 return false;
 
-            for (int i = 0; i < size; i++)
+            for (int i = -1; i <= size; i++)
             {
                 if (i > 0)
                 {
@@ -337,7 +368,7 @@ namespace Battleships.MobileApp.ViewModels.Game
                     if (Tiles.Any(prp => prp.X == startTile.X + i && prp.Y == startTile.Y - 1 && prp.IsShip))
                         return false;
                 }
-                if (startTile.X + i > 9)
+                if (startTile.X + i > 9 && i < size)
                     return false;
             }
 
@@ -351,7 +382,7 @@ namespace Battleships.MobileApp.ViewModels.Game
             if (Tiles.Any(prp => prp.X == startTile.Y + size && prp.Y == startTile.X && prp.IsShip))
                 return false;
 
-            for (int i = 0; i < size; i++)
+            for (int i = -1; i <= size; i++)
             {
                 if (i > 0)
                 {
@@ -362,7 +393,7 @@ namespace Battleships.MobileApp.ViewModels.Game
                     if (Tiles.Any(prp => prp.Y == startTile.Y + i && prp.X == startTile.X - 1 && prp.IsShip))
                         return false;
                 }
-                if (startTile.Y + i > 9)
+                if (startTile.Y + i > 9 && i < size)
                     return false;
                // xCoordinates.Add(startTile.Y + i);
             }

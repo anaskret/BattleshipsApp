@@ -1,4 +1,5 @@
-﻿using Battleships.MobileApp.Views;
+﻿using Battleships.MobileApp.ViewModels.Base;
+using Battleships.MobileApp.Views;
 using Rg.Plugins.Popup.Extensions;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using Xamarin.Forms;
 
 namespace Battleships.MobileApp.ViewModels.Register
 {
-    public class RegisterViewModel : BaseViewModel
+    public class RegisterViewModel : ViewModelBase
     {
         private string _userName;
         public string UserName { get => _userName; set => SetProperty(ref _userName, value); }

@@ -39,9 +39,9 @@
                     </StackLayout>
                 </Frame>
             </StackLayout>
-            <StackLayout Padding="40, 0">
+            <StackLayout HorizontalOptions="Center" Padding="40, 0">
                 <Button Command="{Binding LoginCommand}" Text="Login" HeightRequest="64" 
-                            WidthRequest="360" CornerRadius="10" BackgroundColor="{StaticResource Red}" />
+                            WidthRequest="360" CornerRadius="10" BackgroundColor="{StaticResource Primary}" />
                 <Button Command="{Binding RegisterCommand}" Text="Register" HeightRequest="64" 
                             WidthRequest="360" CornerRadius="10" BackgroundColor="DimGray" />
             </StackLayout>

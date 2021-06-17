@@ -1,4 +1,5 @@
-﻿using Battleships.MobileApp.Views;
+﻿using Battleships.MobileApp.ViewModels.Base;
+using Battleships.MobileApp.Views;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,7 +7,7 @@ using Xamarin.Forms;
 
 namespace Battleships.MobileApp.ViewModels
 {
-    public class LoginViewModel : BaseViewModel
+    public class LoginViewModel : ViewModelBase
     {
         private string _userName;
         public string UserName { get => _userName; set => SetProperty(ref _userName, value); }
