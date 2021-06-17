@@ -200,6 +200,9 @@
                                           SelectedItem="{Binding SelectedOpponentTile}"
                                           FlowLastTappedItem="{Binding SelectedOpponentTile}"
 	                                      FlowItemsSource="{Binding OpponentGrids}" >
+                            <flv:FlowListView.Header>
+                                <Label Text="Opponents board"/>
+                            </flv:FlowListView.Header>
                             <flv:FlowListView.FlowColumnTemplate>
                                 <DataTemplate>
                                     <Frame WidthRequest="10" HeightRequest="10"

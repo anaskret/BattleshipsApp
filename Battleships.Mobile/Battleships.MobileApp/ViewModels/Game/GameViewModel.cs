@@ -131,31 +131,20 @@ namespace Battleships.MobileApp.ViewModels.Game
             PlaceDestroyerCommand = new Command(PlaceDestroyer);
             ClearCommand = new Command(CreateGrid);
             ReadyCommand= new MvvmHelpers.Commands.AsyncCommand(Ready);
-        }
 
-        public override void InitializeAsync()
-        {
-            _gameService.Connect();
-
-
-            MessagingCenter.Subscribe<Application, string>(Application.Current, "OpponentShot", async (sender, args) =>
+            MessagingCenter.Subscribe<GameService, string[]>(this, "OpponentShot", async (sender, args) =>
             {
-                var x = args[0];
-                var y = args[1];
+                var x = Convert.ToInt32(args[0]);
+                var y = Convert.ToInt32(args[1]);
                 var grid = Grids.FirstOrDefault(prp => prp.X == x && prp.Y == y);
 
-                if (grid.IsShip) 
+                if (grid.IsShip)
                 {
                     grid.GridStatus = GridStatusEnum.Hit;
 
-                    foreach(var tile in grid.Ship.ShipTiles)
-                    {
-                        if(tile.GridStatus == GridStatusEnum.NotHit)
-                        {
-                            grid.GridStatus = GridStatusEnum.Hit;
-                            break;
-                        }
-
+                    if (!grid.Ship.ShipTiles.Any(prp => prp.GridStatus == GridStatusEnum.NotHit))
+                    { 
+                        grid.Ship.ShipTiles.ForEach(prp => prp.GridStatus = GridStatusEnum.Sunk);
                         grid.GridStatus = GridStatusEnum.Sunk;
                     }
 
@@ -166,12 +155,32 @@ namespace Battleships.MobileApp.ViewModels.Game
 
                 await _gameService.GridStatus(LobbyId, x, y, (int)grid.GridStatus);
             });
+
+            MessagingCenter.Subscribe<GameService, string[]>(this, "GridHitStatus", async (sender, args) =>
+            {
+                var x = Convert.ToInt32(args[0]);
+                var y = Convert.ToInt32(args[1]);
+                var status = Convert.ToInt32(args[2]);
+                var grid = Grids.FirstOrDefault(prp => prp.X == x && prp.Y == y);
+
+                if (status > 1)
+                {
+                    grid.GridStatus = (GridStatusEnum) status;
+                    turn = player;
+                }
+            });
+        }
+
+        public override void InitializeAsync()
+        {
+            _gameService.Connect();
+
             base.InitializeAsync();
         }
 
         private async Task Shoot()
         {
-            _gameService.Shoot(LobbyId, SelectedOpponentTile.X, SelectedOpponentTile.Y, player);
+            await _gameService.Shoot(LobbyId, SelectedOpponentTile.X, SelectedOpponentTile.Y, player);
         }
 
         private void CreateGrid()

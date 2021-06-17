@@ -15,7 +15,7 @@ namespace Battleships.MobileApp.Models
         private bool _isShip;
         public bool IsShip{ get => _isShip; set => SetProperty(ref _isShip, value); }
 
-        private GridStatusEnum _gridStatus;
+        private GridStatusEnum _gridStatus = GridStatusEnum.NotHit;
         public GridStatusEnum GridStatus { get => _gridStatus; set => SetProperty(ref _gridStatus, value); }
 
         public ShipModel Ship { get; set; }

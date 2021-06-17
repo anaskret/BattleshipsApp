@@ -17,9 +17,7 @@ namespace Battleships.WebApi.Hubs
             else
                 turn = "p1";
 
-            await Clients.Caller.Shoot(lobbyId, x, y, turn);
             await Clients.All.Shoot(lobbyId, x, y, turn);
-            //await Clients.Group(lobbyId.ToString()).Shoot(lobbyId, x, y, turn);
         }
         
         public async Task GridStatus(int lobbyId, int x, int y, int status)

@@ -35,7 +35,14 @@ namespace Battleships.MobileApp.Services.Game
             _connection.On<int, int, int, string>("Shoot", (lobbyId, x, y, player) =>
             {
                 string[] args = { x.ToString(), y.ToString(), player };
-                MessagingCenter.Send(Application.Current, "OpponentShot", args);
+                MessagingCenter.Send(this, "OpponentShot", args);
+                //MessagingCenter.Send(this, "OpponentShot");
+            });
+            
+            _connection.On<int, int, int, int>("GridStatus", (lobbyId, x, y, status) =>
+            {
+                string[] args = { x.ToString(), y.ToString(), status.ToString() };
+                MessagingCenter.Send(this, "GridHitStatus", args);
             });
 
             try
@@ -64,7 +71,7 @@ namespace Battleships.MobileApp.Services.Game
 
         public async Task GridStatus(int lobbyId, int x, int y, int status)
         {
-             await _connection.InvokeAsync("Shoot", lobbyId, x, y, status);
+             await _connection.InvokeAsync("GridStatus", lobbyId, x, y, status);
         }
     }
 }
