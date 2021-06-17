@@ -110,6 +110,11 @@ namespace Battleships.WebApi
 
             app.UseRouting();
 
+            app.UseCors(config => config
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+
             app.UseAuthentication();
             app.UseAuthorization();
 
