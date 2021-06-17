@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace Battleships.Models.Dtos
 {
-    public class ExampleDto
+    public class PlayerDto
     {
-
-
+        public int Id { get; set; }
+        public string Username { get; set; }
+        public int Wins { get; set; }
     }
 }
