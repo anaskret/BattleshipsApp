@@ -29,7 +29,7 @@ namespace Battleships.WebApi.Controllers
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex);
+                return BadRequest(ex.Message);
             }
 
         }
@@ -44,11 +44,11 @@ namespace Battleships.WebApi.Controllers
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex);
+                return BadRequest(ex.Message);
             }
             catch(Exception ex)
             {
-                return StatusCode(500, ex);
+                return StatusCode(500, ex.Message);
             }
         }
     }
