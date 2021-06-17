@@ -44,7 +44,11 @@ namespace Battleships.WebApi.Controllers
             }
             catch (ArgumentException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex);
+                return BadRequest(ex);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, ex);
             }
         }
     }

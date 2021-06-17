@@ -1,9 +1,9 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Battleships.DataAccess.Migrations.IdentityDatabase
+namespace Battleships.DataAccess.Migrations
 {
-    public partial class initial_identity : Migration
+    public partial class Identity : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

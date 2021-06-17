@@ -1,5 +1,4 @@
 using Battleships.DataAccess;
-using Battleships.DataAccess.Identity;
 using Battleships.Models.Entities.User;
 using Battleships.Repositories.Repositories;
 using Battleships.Repositories.Repositories.Generic;
@@ -7,6 +6,7 @@ using Battleships.Repositories.Repositories.Interfaces;
 using Battleships.Repositories.Repositories.Interfaces.Generic;
 using Battleships.Services.Services;
 using Battleships.Services.Services.Interfaces;
+using Battleships.WebApi.Configuration;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -39,40 +39,11 @@ namespace Battleships.WebApi
             services.AddDbContext<AppDbContext>(options =>
                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddDbContext<IdentityDatabaseContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
             services.AddControllers();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Battleships.WebApi", Version = "v1" });
-            });
-
-            var securityScheme = new OpenApiSecurityScheme
-            {
-                Name = "JWT Authentication",
-                Description = "Enter JWT Bearer token **_only_**",
-                In = ParameterLocation.Header,
-                Type = SecuritySchemeType.Http,
-                Scheme = "bearer",
-                BearerFormat = "JWT",
-                Reference = new OpenApiReference
-                {
-                    Id = JwtBearerDefaults.AuthenticationScheme,
-                    Type = ReferenceType.SecurityScheme
-                }
-            };
-
-            services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
-            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
-            services.AddTransient<IExampleRepository, ExampleRepository>();
-
-            services.AddScoped<Services.Services.Interfaces.IAuthenticationService, Services.Services.AuthenticationService>();
-            services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
+            
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
-                            .AddEntityFrameworkStores<IdentityDatabaseContext>()
+                            .AddEntityFrameworkStores<AppDbContext>()
                             .AddDefaultTokenProviders();
 
             services.AddAuthentication(options =>
@@ -93,6 +64,34 @@ namespace Battleships.WebApi
                     RequireExpirationTime = false,
                 };
             });
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Battleships.WebApi", Version = "v1" });
+            });
+
+            var securityScheme = new OpenApiSecurityScheme
+            {
+                Name = "JWT Authentication",
+                Description = "Enter JWT Bearer token **_only_**",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                Reference = new OpenApiReference
+                {
+                    Id = JwtBearerDefaults.AuthenticationScheme,
+                    Type = ReferenceType.SecurityScheme
+                }
+            };
+            
+            services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+            services.AddTransient<IExampleRepository, ExampleRepository>();
+
+            services.AddScoped<Services.Services.Interfaces.IAuthenticationService, Services.Services.AuthenticationService>();
+            services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
         }
                 
 
@@ -102,8 +101,6 @@ namespace Battleships.WebApi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Battleships.WebApi v1"));
             }
 
             app.UseHttpsRedirection();
@@ -112,6 +109,19 @@ namespace Battleships.WebApi
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            var swaggerOptions = new SwaggerConfig();
+            Configuration.GetSection(nameof(SwaggerConfig)).Bind(swaggerOptions);
+
+            app.UseSwagger(option =>
+            {
+                option.RouteTemplate = swaggerOptions.JsonRoute;
+            });
+
+            app.UseSwaggerUI(option =>
+            {
+                option.SwaggerEndpoint(swaggerOptions.UiEndpoint, swaggerOptions.Description);
+            });
 
             app.UseEndpoints(endpoints =>
             {
