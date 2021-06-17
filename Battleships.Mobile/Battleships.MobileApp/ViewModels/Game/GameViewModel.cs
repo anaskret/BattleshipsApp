@@ -1,10 +1,12 @@
 ﻿using Battleships.MobileApp.Models;
 using Battleships.MobileApp.Models.Enums;
+using Battleships.MobileApp.Services.Game;
 using Battleships.MobileApp.ViewModels.Base;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace Battleships.MobileApp.ViewModels.Game
@@ -12,23 +14,64 @@ namespace Battleships.MobileApp.ViewModels.Game
     [QueryProperty(nameof(LobbyId), nameof(LobbyId))]
     public class GameViewModel : ViewModelBase
     {
-        private ObservableCollection<TileModel> _tiles;
-        public ObservableCollection<TileModel> Tiles { get => _tiles; set => SetProperty(ref _tiles, value); }
+        private readonly IGameService _gameService;
 
-        private int _lobbyId;
-        public int LobbyId
-        {
-            get => _lobbyId;
+        private GridModel _selectedTile;
+        public GridModel SelectedTile 
+        { 
+            get => _selectedTile;
             set
             {
-                SetProperty(ref _lobbyId, Convert.ToInt32(Uri.UnescapeDataString(value.ToString())));
+                if (value == null)
+                    return;
+                /*if (!IsInPlacement)
+                {
+                    _selectedTile = value;
+                    Shoot();
+                }*/
+                else if(IsInPlacement && value.IsShip)
+                {
+                    _selectedTile = value;
+                    RotateShip();
+                }
+                else if(IsInPlacement)
+                {
+                    _selectedTile = value;
+                    PlaceShip();
+                }
+
+                _selectedTile = null;
+                OnPropertyChanged();
+            }
+        }
+        
+        private GridModel _selectedOpponentTile;
+        public GridModel SelectedOpponentTile 
+        { 
+            get => _selectedOpponentTile;
+            set
+            {
+                if (value == null || player != turn)
+                    return;
+                if (!IsInPlacement)
+                {
+                    _selectedOpponentTile = value;
+                    Shoot();
+                }
+
+                _selectedOpponentTile = null;
                 OnPropertyChanged();
             }
         }
 
+        private ObservableCollection<GridModel> _grids;
+        public ObservableCollection<GridModel> Grids { get => _grids; set => SetProperty(ref _grids, value); }
+        
+        private ObservableCollection<GridModel> _opponentGrids;
+        public ObservableCollection<GridModel> OpponentGrids { get => _opponentGrids; set => SetProperty(ref _opponentGrids, value); }
+
         public List<ShipModel> Ships { get; set; }
 
-        //Carriers, Battleships, Cruisers, Submarines, Destroyers
         private int _carriersLeftCount = 1;
         public int CarriersLeftCount { get => _carriersLeftCount; set => SetProperty(ref _carriersLeftCount, value); }
         
@@ -44,42 +87,27 @@ namespace Battleships.MobileApp.ViewModels.Game
         private int _destroyersLeftCount = 5;
         public int DestroyersLeftCount { get => _destroyersLeftCount; set => SetProperty(ref _destroyersLeftCount, value); }
 
-        private bool _isReady;
-        public bool IsReady { get => _isReady; set => SetProperty(ref _isReady, value); }
-
         private ShipsEnum _currentShipForPlacement;
 
-        private bool isInPlacement = true;
+        private bool _isInPlacement = true;
+        public bool IsInPlacement { get => _isInPlacement; set => SetProperty(ref _isInPlacement, value); }
 
-
-        private TileModel _selectedTile;
-        public TileModel SelectedTile 
-        { 
-            get => _selectedTile;
+        private int _lobbyId;
+        public int LobbyId
+        {
+            get => _lobbyId;
             set
             {
-                if (value == null)
-                    return;
-                if (!isInPlacement)
-                {
-                    _selectedTile = value;
-                    //Shoot()
-                }
-                else if(isInPlacement && value.IsShip)
-                {
-                    _selectedTile = value;
-                    RotateShip();
-                }
-                else if(isInPlacement)
-                {
-                    _selectedTile = value;
-                    PlaceShip();
-                }
-
-                _selectedTile = null;
+                SetProperty(ref _lobbyId, Convert.ToInt32(Uri.UnescapeDataString(value.ToString())));
                 OnPropertyChanged();
             }
         }
+
+        private bool _isReady;
+        public bool IsReady { get => _isReady; set => SetProperty(ref _isReady, value); }
+
+        private string player = "p1";
+        private string turn = "p1";
 
         public Command PlaceCarrierCommand{ get; set; }
         public Command PlaceBattleshipCommand{ get; set; }
@@ -87,36 +115,103 @@ namespace Battleships.MobileApp.ViewModels.Game
         public Command PlaceSubmarineCommand{ get; set; }
         public Command PlaceDestroyerCommand{ get; set; }
         public Command ClearCommand{ get; set; }
-        public Command ReadyCommand{ get; set; }
+        public MvvmHelpers.Commands.AsyncCommand ReadyCommand{ get; set; }
 
         public GameViewModel()
         {
-            CreateTiles();
+            _gameService = DependencyService.Get<IGameService>();
+
+            CreateGrid();
+            CreateOpponentGrid();
 
             PlaceCarrierCommand = new Command(PlaceCarrier);
             PlaceBattleshipCommand = new Command(PlaceBattleship);
             PlaceCruiserCommand = new Command(PlaceCruiser);
             PlaceSubmarineCommand = new Command(PlaceSubmarine);
             PlaceDestroyerCommand = new Command(PlaceDestroyer);
-            ClearCommand = new Command(CreateTiles);
+            ClearCommand = new Command(CreateGrid);
+            ReadyCommand= new MvvmHelpers.Commands.AsyncCommand(Ready);
         }
 
-        private void CreateTiles()
+        public override void InitializeAsync()
         {
-            Tiles = new ObservableCollection<TileModel>();
+            _gameService.Connect();
+
+
+            MessagingCenter.Subscribe<Application, string>(Application.Current, "OpponentShot", async (sender, args) =>
+            {
+                var x = args[0];
+                var y = args[1];
+                var grid = Grids.FirstOrDefault(prp => prp.X == x && prp.Y == y);
+
+                if (grid.IsShip) 
+                {
+                    grid.GridStatus = GridStatusEnum.Hit;
+
+                    foreach(var tile in grid.Ship.ShipTiles)
+                    {
+                        if(tile.GridStatus == GridStatusEnum.NotHit)
+                        {
+                            grid.GridStatus = GridStatusEnum.Hit;
+                            break;
+                        }
+
+                        grid.GridStatus = GridStatusEnum.Sunk;
+                    }
+
+                    await _gameService.GridStatus(LobbyId, x, y, (int)grid.GridStatus);
+                    return;
+                }
+                turn = player;
+
+                await _gameService.GridStatus(LobbyId, x, y, (int)grid.GridStatus);
+            });
+            base.InitializeAsync();
+        }
+
+        private async Task Shoot()
+        {
+            _gameService.Shoot(LobbyId, SelectedOpponentTile.X, SelectedOpponentTile.Y, player);
+        }
+
+        private void CreateGrid()
+        {
+            Grids = new ObservableCollection<GridModel>();
             Ships = new List<ShipModel>();
 
             CarriersLeftCount = 1;
-            BattleshipsLeftCount = 2;
+            /*BattleshipsLeftCount = 2;
             CruisersLeftCount = 3;
             SubmarinesLeftCount = 4;
-            DestroyersLeftCount = 5;
+            DestroyersLeftCount = 5;*/
+            BattleshipsLeftCount = 0;
+            CruisersLeftCount = 0;
+            SubmarinesLeftCount = 0;
+            DestroyersLeftCount = 0;
 
             for (int i = 0; i < 10; i++)
             {
                 for (int j = 0; j < 10; j++)
                 {
-                    Tiles.Add(new TileModel() { X = j, Y = i });
+                    Grids.Add(new GridModel() { X = j, Y = i });
+                }
+            }
+        }
+
+        private async Task Ready()
+        {
+            IsInPlacement = false;
+        }
+
+        private void CreateOpponentGrid()
+        {
+            OpponentGrids = new ObservableCollection<GridModel>();
+
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                    OpponentGrids.Add(new GridModel() { X = j, Y = i });
                 }
             }
         }
@@ -254,11 +349,11 @@ namespace Battleships.MobileApp.ViewModels.Game
                 var ship = new ShipModel();
                 foreach(var coordinate in xCoordinates)
                 {
-                    var tile = Tiles.FirstOrDefault(prp => prp.X == coordinate && prp.Y == SelectedTile.Y);
+                    var grid = Grids.FirstOrDefault(prp => prp.X == coordinate && prp.Y == SelectedTile.Y);
 
-                    tile.IsShip = true;
-                    ship.ShipTiles.Add(tile);
-                    tile.Ship = ship;
+                    grid.IsShip = true;
+                    ship.ShipTiles.Add(grid);
+                    grid.Ship = ship;
                     Ships.Add(ship);
                 }
 
@@ -308,19 +403,19 @@ namespace Battleships.MobileApp.ViewModels.Game
                     tile.IsShip = false;
                 }
 
-                SelectedTile.Ship.ShipTiles = new List<TileModel>();
+                SelectedTile.Ship.ShipTiles = new List<GridModel>();
 
                 foreach (var coordinate in Coordinates)
                 {
-                    TileModel tile;
+                    GridModel grid;
                     if(!SelectedTile.Ship.IsVertical)
-                        tile = Tiles.FirstOrDefault(prp => prp.Y == coordinate && prp.X == startTile.X);
+                        grid = Grids.FirstOrDefault(prp => prp.Y == coordinate && prp.X == startTile.X);
                     else
-                        tile = Tiles.FirstOrDefault(prp => prp.X == coordinate && prp.Y == startTile.Y);
+                        grid = Grids.FirstOrDefault(prp => prp.X == coordinate && prp.Y == startTile.Y);
 
-                    tile.IsShip = true;
-                    SelectedTile.Ship.ShipTiles.Add(tile);
-                    tile.Ship = SelectedTile.Ship;
+                    grid.IsShip = true;
+                    SelectedTile.Ship.ShipTiles.Add(grid);
+                    grid.Ship = SelectedTile.Ship;
                 }
                 SelectedTile.Ship.IsVertical = !SelectedTile.Ship.IsVertical;
 
@@ -328,20 +423,20 @@ namespace Battleships.MobileApp.ViewModels.Game
             }
         }
 
-        private bool ValidateShipXCoordinates(TileModel startTile, int size)
+        private bool ValidateShipXCoordinates(GridModel startTile, int size)
         {
-            if (Tiles.Any(prp => prp.X == startTile.X - 1 && prp.Y == startTile.Y && prp.IsShip))
+            if (Grids.Any(prp => prp.X == startTile.X - 1 && prp.Y == startTile.Y && prp.IsShip))
                 return false;
-            if (Tiles.Any(prp => prp.X == startTile.X + size && prp.Y == startTile.Y && prp.IsShip))
+            if (Grids.Any(prp => prp.X == startTile.X + size && prp.Y == startTile.Y && prp.IsShip))
                 return false;
 
             for (int i = -1; i <= size; i++)
             {
-                if (Tiles.Any(prp => prp.X == startTile.X + i && prp.Y == startTile.Y && prp.IsShip))
+                if (Grids.Any(prp => prp.X == startTile.X + i && prp.Y == startTile.Y && prp.IsShip))
                     return false;
-                if (Tiles.Any(prp => prp.X == startTile.X + i && prp.Y == startTile.Y + 1 && prp.IsShip))
+                if (Grids.Any(prp => prp.X == startTile.X + i && prp.Y == startTile.Y + 1 && prp.IsShip))
                     return false;
-                if (Tiles.Any(prp => prp.X == startTile.X + i && prp.Y == startTile.Y - 1 && prp.IsShip))
+                if (Grids.Any(prp => prp.X == startTile.X + i && prp.Y == startTile.Y - 1 && prp.IsShip))
                     return false;
                 if (startTile.X + i > 9 && i < size)
                     return false;
@@ -350,22 +445,22 @@ namespace Battleships.MobileApp.ViewModels.Game
             return true;
         }
         
-        private bool ValidateRotateShipXCoordinates(TileModel startTile, int size)
+        private bool ValidateRotateShipXCoordinates(GridModel startTile, int size)
         {
-            if (Tiles.Any(prp => prp.X == startTile.X - 1 && prp.Y == startTile.Y && prp.IsShip))
+            if (Grids.Any(prp => prp.X == startTile.X - 1 && prp.Y == startTile.Y && prp.IsShip))
                 return false;
-            if (Tiles.Any(prp => prp.X == startTile.X + size && prp.Y == startTile.Y && prp.IsShip))
+            if (Grids.Any(prp => prp.X == startTile.X + size && prp.Y == startTile.Y && prp.IsShip))
                 return false;
 
             for (int i = -1; i <= size; i++)
             {
                 if (i > 0)
                 {
-                    if (Tiles.Any(prp => prp.X == startTile.X + i && prp.Y == startTile.Y && prp.IsShip))
+                    if (Grids.Any(prp => prp.X == startTile.X + i && prp.Y == startTile.Y && prp.IsShip))
                         return false;
-                    if (Tiles.Any(prp => prp.X == startTile.X + i && prp.Y == startTile.Y + 1 && prp.IsShip))
+                    if (Grids.Any(prp => prp.X == startTile.X + i && prp.Y == startTile.Y + 1 && prp.IsShip))
                         return false;
-                    if (Tiles.Any(prp => prp.X == startTile.X + i && prp.Y == startTile.Y - 1 && prp.IsShip))
+                    if (Grids.Any(prp => prp.X == startTile.X + i && prp.Y == startTile.Y - 1 && prp.IsShip))
                         return false;
                 }
                 if (startTile.X + i > 9 && i < size)
@@ -375,22 +470,22 @@ namespace Battleships.MobileApp.ViewModels.Game
             return true;
         }
         
-        private bool ValidateShipYCoordinates(TileModel startTile, int size)
+        private bool ValidateShipYCoordinates(GridModel startTile, int size)
         {
-            if (Tiles.Any(prp => prp.X == startTile.Y - 1 && prp.Y == startTile.X && prp.IsShip))
+            if (Grids.Any(prp => prp.X == startTile.Y - 1 && prp.Y == startTile.X && prp.IsShip))
                 return false;
-            if (Tiles.Any(prp => prp.X == startTile.Y + size && prp.Y == startTile.X && prp.IsShip))
+            if (Grids.Any(prp => prp.X == startTile.Y + size && prp.Y == startTile.X && prp.IsShip))
                 return false;
 
             for (int i = -1; i <= size; i++)
             {
                 if (i > 0)
                 {
-                    if (Tiles.Any(prp => prp.Y == startTile.Y + i && prp.X == startTile.X && prp.IsShip))
+                    if (Grids.Any(prp => prp.Y == startTile.Y + i && prp.X == startTile.X && prp.IsShip))
                         return false;
-                    if (Tiles.Any(prp => prp.Y == startTile.Y + i && prp.X == startTile.X + 1 && prp.IsShip))
+                    if (Grids.Any(prp => prp.Y == startTile.Y + i && prp.X == startTile.X + 1 && prp.IsShip))
                         return false;
-                    if (Tiles.Any(prp => prp.Y == startTile.Y + i && prp.X == startTile.X - 1 && prp.IsShip))
+                    if (Grids.Any(prp => prp.Y == startTile.Y + i && prp.X == startTile.X - 1 && prp.IsShip))
                         return false;
                 }
                 if (startTile.Y + i > 9 && i < size)

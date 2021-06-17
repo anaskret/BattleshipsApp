@@ -7,6 +7,8 @@ using Battleships.Repositories.Repositories.Interfaces.Generic;
 using Battleships.Services.Services;
 using Battleships.Services.Services.Interfaces;
 using Battleships.WebApi.Configuration;
+using Battleships.WebApi.Hubs;
+using Battleships.WebApi.Hubs.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -40,7 +42,8 @@ namespace Battleships.WebApi
                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddControllers();
-            
+
+            services.AddSignalR();
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                             .AddEntityFrameworkStores<AppDbContext>()
@@ -103,7 +106,7 @@ namespace Battleships.WebApi
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
 
@@ -126,6 +129,7 @@ namespace Battleships.WebApi
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<GameHub>("api/gameHub");
             });
         }
     }

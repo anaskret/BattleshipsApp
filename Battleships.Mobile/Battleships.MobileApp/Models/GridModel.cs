@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Battleships.MobileApp.Models.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -6,7 +7,7 @@ using System.Text;
 
 namespace Battleships.MobileApp.Models
 {
-    public class TileModel : ObservableProperty
+    public class GridModel : ObservableProperty
     {
         public int X { get; set; }
         public int Y { get; set; }
@@ -14,11 +15,8 @@ namespace Battleships.MobileApp.Models
         private bool _isShip;
         public bool IsShip{ get => _isShip; set => SetProperty(ref _isShip, value); }
 
-        private bool _isShot = false;
-        public bool IsShot { get => _isShot; set => SetProperty(ref _isShot, value); }
-
-        private bool _isSunk = false;
-        public bool IsSunk { get => _isSunk; set => SetProperty(ref _isSunk, value); }
+        private GridStatusEnum _gridStatus;
+        public GridStatusEnum GridStatus { get => _gridStatus; set => SetProperty(ref _gridStatus, value); }
 
         public ShipModel Ship { get; set; }
     }

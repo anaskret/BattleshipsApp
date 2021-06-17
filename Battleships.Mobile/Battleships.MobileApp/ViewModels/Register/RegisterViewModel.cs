@@ -1,4 +1,6 @@
-﻿using Battleships.MobileApp.ViewModels.Base;
+﻿using Battleships.MobileApp.Models.Authentication;
+using Battleships.MobileApp.Services.Authorization;
+using Battleships.MobileApp.ViewModels.Base;
 using Battleships.MobileApp.Views;
 using Rg.Plugins.Popup.Extensions;
 using System;
@@ -11,6 +13,8 @@ namespace Battleships.MobileApp.ViewModels.Register
 {
     public class RegisterViewModel : ViewModelBase
     {
+        private readonly IAuthService _authService;
+
         private string _userName;
         public string UserName { get => _userName; set => SetProperty(ref _userName, value); }
 
@@ -24,6 +28,8 @@ namespace Battleships.MobileApp.ViewModels.Register
 
         public RegisterViewModel()
         {
+            _authService = DependencyService.Get<IAuthService>();
+
             RegisterCommand = new Command(OnRegisterClicked);
         }
 
@@ -45,7 +51,15 @@ namespace Battleships.MobileApp.ViewModels.Register
                 return;
             }
 
-            //check if username is already occupied
+            try
+            {
+                await _authService.Register(new AuthModel(UserName, Password));
+            }
+            catch(Exception ex)
+            {
+                DisplayErrorMessage(ex.Message);
+                return;
+            }
 
             await Shell.Current.GoToAsync($"//{nameof(LoginPage)}");
         }

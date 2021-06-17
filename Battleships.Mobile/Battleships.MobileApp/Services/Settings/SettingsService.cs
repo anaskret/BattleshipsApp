@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Battleships.MobileApp.Services.Settings
 {
-    public class SettingsService
+    public class SettingsService : ISettingsService
     {
         private string _userName;
         public string UserName 
@@ -23,7 +23,7 @@ namespace Battleships.MobileApp.Services.Settings
         private string _accessRefreshToken = "access_refresh_token";
         private DateTime _accessRefreshTokenExpired = new DateTime();
 
-        string AuthAccessToken 
+        public string AuthAccessToken 
         { 
             get => _accessToken; 
             set
@@ -34,7 +34,7 @@ namespace Battleships.MobileApp.Services.Settings
                 _accessToken = value;
             }
         }
-        string AuthAccessRefreshToken 
+        public string AuthAccessRefreshToken 
         { 
             get => _accessRefreshToken; 
             set
@@ -45,7 +45,7 @@ namespace Battleships.MobileApp.Services.Settings
                 _accessRefreshToken = value;
             }
         }
-        DateTime AuthAccessRefreshExpired { 
+        public DateTime AuthAccessRefreshExpired { 
             get => _accessRefreshTokenExpired;
             set
             {
