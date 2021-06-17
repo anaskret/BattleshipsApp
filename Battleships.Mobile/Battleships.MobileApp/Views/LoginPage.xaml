@@ -43,7 +43,7 @@
                 <Button Command="{Binding LoginCommand}" Text="Login" HeightRequest="64" 
                             WidthRequest="360" CornerRadius="10" BackgroundColor="{StaticResource Primary}" />
                 <Button Command="{Binding RegisterCommand}" Text="Register" HeightRequest="64" 
-                            WidthRequest="360" CornerRadius="10" BackgroundColor="DimGray" />
+                            WidthRequest="360" CornerRadius="10" BackgroundColor="LightSlateGray" />
             </StackLayout>
         </StackLayout>
     </Grid>

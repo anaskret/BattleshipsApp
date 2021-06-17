@@ -32,7 +32,7 @@
                        FontSize="14"
                        HorizontalOptions="Center" HorizontalTextAlignment="Center"
                        Padding="30, 15, 30, 30"/>
-                <Button Text="OK" Command="{Binding ClosePopupCommand}" BackgroundColor="Gray" FontAttributes="Bold"
+                <Button Text="OK" Command="{Binding ClosePopupCommand}" BackgroundColor="LightSlateGray" FontAttributes="Bold"
                         HeightRequest="48" Margin="20, 5" CornerRadius="10"/>
             </StackLayout>
         </Frame>
