@@ -21,6 +21,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
+using System.Linq;
 using System.Text;
 
 
@@ -71,6 +72,7 @@ namespace Battleships.WebApi
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Battleships.WebApi", Version = "v1" });
+                c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
             });
 
             var securityScheme = new OpenApiSecurityScheme
@@ -87,7 +89,7 @@ namespace Battleships.WebApi
                     Type = ReferenceType.SecurityScheme
                 }
             };
-            
+
             services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -95,12 +97,17 @@ namespace Battleships.WebApi
 
             services.AddScoped<Services.Services.Interfaces.IAuthenticationService, Services.Services.AuthenticationService>();
             services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
+
+            services.AddScoped<ILobbyRepository, LobbyRepository>();
+            services.AddScoped<ILobbyService, LobbyService>();
         }
-                
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseDeveloperExceptionPage();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

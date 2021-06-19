@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace Battleships.WebApi.Controllers
 {
-    [Authorize]
     public class PlayerController : Controller
     {
         private readonly IPlayerService _playerService;
