@@ -100,6 +100,9 @@ namespace Battleships.WebApi
 
             services.AddScoped<ILobbyRepository, LobbyRepository>();
             services.AddScoped<ILobbyService, LobbyService>();
+
+            services.AddScoped<IPlayerRepository, PlayerRepository>();
+            services.AddScoped<IPlayerService, PlayerService>();
         }
 
 
