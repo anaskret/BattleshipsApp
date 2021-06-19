@@ -2,6 +2,8 @@
 using Battleships.DataAccess.Migrations;
 using Battleships.Models.Dtos;
 using Battleships.Models.Entities.Example;
+using Battleships.Models.Entities.Lobby;
+using Battleships.Models.Entities.Player;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +17,7 @@ namespace Battleships.WebApi.Extensions.AutoMapper
         {
             CreateMap<DataAccess.Migrations.Example, ExampleDto>();
             CreateMap<ExampleDto, DataAccess.Migrations.Example>();
+
         }
     }
 }

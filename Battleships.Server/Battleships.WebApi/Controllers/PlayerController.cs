@@ -45,7 +45,7 @@ namespace Battleships.WebApi.Controllers
             }
         }
 
-        [HttpPost("api/lobby")]
+        [HttpPost("api/player")]
         public async Task<IActionResult> Create([FromBody] PlayerDto player)
         {
             try
