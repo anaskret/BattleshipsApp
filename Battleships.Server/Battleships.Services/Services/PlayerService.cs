@@ -54,5 +54,11 @@ namespace Battleships.Services.Services
         {
             await _playerRepository.UpdateAsync(_mapper.Map<Player>(player));
         }
+
+        public async Task<List<PlayerDto>> GetRanking()
+        {
+            var players = await _playerRepository.GetAllAsync();
+            return players.Select(prp => _mapper.Map<PlayerDto>(prp)).OrderBy(prp => prp.Wins).ToList();
+        }
     }
 }
