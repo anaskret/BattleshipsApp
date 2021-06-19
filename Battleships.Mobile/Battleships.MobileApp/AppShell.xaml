@@ -83,7 +83,7 @@
         <ShellContent ContentTemplate="{DataTemplate local:LoginPage}"/>
     </ShellItem>
     
-    <FlyoutItem Title="About" Icon="icon_about.png">
+    <FlyoutItem Title="Welcome" Icon="icon_about.png">
         <ShellContent Route="AboutPage" ContentTemplate="{DataTemplate local:AboutPage}" />
     </FlyoutItem>
     <FlyoutItem Title="Game" Icon="icon_feed.png">
@@ -91,6 +91,9 @@
     </FlyoutItem>
     <FlyoutItem Title="New Game" Icon="icon_feed.png">
         <ShellContent Route="NewLobby" ContentTemplate="{DataTemplate local:NewLobby}" />
+    </FlyoutItem>
+    <FlyoutItem Title="Photos" Icon="icon_feed.png">
+        <ShellContent Route="PhotosListPage" ContentTemplate="{DataTemplate local:PhotosListPage}" />
     </FlyoutItem>
 
     <!-- When the Flyout is visible this will be a menu item you can tie a click behavior to  -->

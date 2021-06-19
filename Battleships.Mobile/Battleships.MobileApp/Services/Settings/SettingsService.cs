@@ -20,8 +20,6 @@ namespace Battleships.MobileApp.Services.Settings
         }
 
         private string _accessToken = "access_token";
-        private string _accessRefreshToken = "access_refresh_token";
-        private DateTime _accessRefreshTokenExpired = new DateTime();
 
         public string AuthAccessToken 
         { 
@@ -32,27 +30,6 @@ namespace Battleships.MobileApp.Services.Settings
                     return;
 
                 _accessToken = value;
-            }
-        }
-        public string AuthAccessRefreshToken 
-        { 
-            get => _accessRefreshToken; 
-            set
-            {
-                if (value == null)
-                    return;
-
-                _accessRefreshToken = value;
-            }
-        }
-        public DateTime AuthAccessRefreshExpired { 
-            get => _accessRefreshTokenExpired;
-            set
-            {
-                if (value == null)
-                    return;
-
-                _accessRefreshTokenExpired = value;
             }
         }
     }

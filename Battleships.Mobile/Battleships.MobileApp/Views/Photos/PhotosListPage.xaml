@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Battleships.MobileApp.ViewModels.Photos"
+             x:Class="Battleships.MobileApp.Views.PhotosListPage">
+    <ContentPage.BindingContext>
+        <vm:PhotosListViewModel/>
+    </ContentPage.BindingContext>
+    <ListView ItemsSource="{Binding Photos}">
+        <ListView.Header>
+            <Button Text="Take a photo" Command="{Binding TakePhotoCommand}" BackgroundColor="Gray" FontAttributes="Bold"
+                    HeightRequest="48" Margin="20, 5" CornerRadius="10"/>
+        </ListView.Header>
+        <ListView.ItemTemplate>
+            <DataTemplate>
+                <ViewCell>
+                    <Image Source="{Binding Image}"/>
+                </ViewCell>
+            </DataTemplate>
+        </ListView.ItemTemplate>
+    </ListView>
+</ContentPage>

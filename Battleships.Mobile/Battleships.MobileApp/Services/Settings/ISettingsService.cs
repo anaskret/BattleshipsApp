@@ -9,7 +9,5 @@ namespace Battleships.MobileApp.Services.Settings
         string UserName { get; set; }
 
         string AuthAccessToken { get; set; }
-        string AuthAccessRefreshToken { get; set; }
-        DateTime AuthAccessRefreshExpired { get; set; }
     }
 }

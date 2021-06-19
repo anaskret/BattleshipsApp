@@ -2,10 +2,11 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Battleships.MobileApp.ViewModels.Lobby"
-             x:Class="Battleships.MobileApp.Views.NewLobby">
+             x:Class="Battleships.MobileApp.Views.Lobby.JoinLobby">
     <ContentPage.BindingContext>
-        <vm:NewLobbyViewModel/>
+        <vm:JoinLobbyViewModel/>
     </ContentPage.BindingContext>
+    
     <Frame VerticalOptions="Center" HorizontalOptions="Center" Margin="20">
         <StackLayout Margin="5">
             <Frame CornerRadius="10"
@@ -20,7 +21,7 @@
                            HorizontalOptions="StartAndExpand"/>
                 </StackLayout>
             </Frame>
-            <Button Text="Create" Command="{Binding CreateCommand}" BackgroundColor="LightSlateGray" FontAttributes="Bold"
+            <Button Text="Join" Command="{Binding JoinCommand}" BackgroundColor="LightSlateGray" FontAttributes="Bold"
                         HeightRequest="48" Margin="20, 5" CornerRadius="10"/>
         </StackLayout>
     </Frame>

@@ -1,5 +1,6 @@
 ﻿using Battleships.MobileApp.Services.Authorization;
 using Battleships.MobileApp.Services.Game;
+using Battleships.MobileApp.Services.Lobby;
 using Battleships.MobileApp.Services.RequestProvider;
 using Battleships.MobileApp.Services.Settings;
 using DLToolkit.Forms.Controls;
@@ -21,6 +22,7 @@ namespace Battleships.MobileApp
             DependencyService.Register<IRequestProvider, RequestProvider>();
             DependencyService.Register<IAuthService, AuthService>();
             DependencyService.Register<IGameService, GameService>();
+            DependencyService.Register<ILobbyService, LobbyService>();
 
             FlowListView.Init();
             MainPage = new AppShell();
