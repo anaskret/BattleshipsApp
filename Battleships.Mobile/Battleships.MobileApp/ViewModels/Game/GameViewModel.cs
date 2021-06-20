@@ -1,7 +1,12 @@
-﻿using Battleships.MobileApp.Models;
+﻿using Battleships.MobileApp.Helpers;
+using Battleships.MobileApp.Models;
 using Battleships.MobileApp.Models.Enums;
 using Battleships.MobileApp.Services.Game;
+using Battleships.MobileApp.Services.Lobby;
+using Battleships.MobileApp.Services.Settings;
 using Battleships.MobileApp.ViewModels.Base;
+using Battleships.MobileApp.Views;
+using Rg.Plugins.Popup.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,6 +20,8 @@ namespace Battleships.MobileApp.ViewModels.Game
     public class GameViewModel : ViewModelBase
     {
         private readonly IGameService _gameService;
+        private readonly ILobbyService _lobbyService;
+        private readonly ISettingsService _settingsService;
 
         private GridModel _selectedTile;
         public GridModel SelectedTile 
@@ -24,11 +31,6 @@ namespace Battleships.MobileApp.ViewModels.Game
             {
                 if (value == null)
                     return;
-                /*if (!IsInPlacement)
-                {
-                    _selectedTile = value;
-                    Shoot();
-                }*/
                 else if(IsInPlacement && value.IsShip)
                 {
                     _selectedTile = value;
@@ -103,6 +105,8 @@ namespace Battleships.MobileApp.ViewModels.Game
             }
         }
 
+        private bool isOpponentReady;
+        private bool isPlayerReady;
         private bool _isReady;
         public bool IsReady { get => _isReady; set => SetProperty(ref _isReady, value); }
 
@@ -120,6 +124,8 @@ namespace Battleships.MobileApp.ViewModels.Game
         public GameViewModel()
         {
             _gameService = DependencyService.Get<IGameService>();
+            _lobbyService = DependencyService.Get<ILobbyService>();
+            _settingsService = DependencyService.Get<ISettingsService>();
 
             CreateGrid();
             CreateOpponentGrid();
@@ -138,9 +144,11 @@ namespace Battleships.MobileApp.ViewModels.Game
                 var y = Convert.ToInt32(args[1]);
                 var grid = Grids.FirstOrDefault(prp => prp.X == x && prp.Y == y);
 
+                grid.GridStatus = GridStatusEnum.Hit;
+
                 if (grid.IsShip)
                 {
-                    grid.GridStatus = GridStatusEnum.Hit;
+                    grid.GridStatus = GridStatusEnum.ShipHit;
 
                     if (!grid.Ship.ShipTiles.Any(prp => prp.GridStatus == GridStatusEnum.NotHit))
                     { 
@@ -149,6 +157,16 @@ namespace Battleships.MobileApp.ViewModels.Game
                     }
 
                     await _gameService.GridStatus(LobbyId, x, y, (int)grid.GridStatus);
+
+                    foreach(var ship in Ships)
+                    {
+                        if(ship.ShipTiles.Any(prp => prp.GridStatus == GridStatusEnum.Sunk))
+                        {
+                            await _gameService.Victory(LobbyId);
+                            PopupHelper.DisplayGameOverMessage("You lost :(", "Game Over", LobbyId);
+                            return;
+                        }
+                    }
                     return;
                 }
                 turn = player;
@@ -156,30 +174,82 @@ namespace Battleships.MobileApp.ViewModels.Game
                 await _gameService.GridStatus(LobbyId, x, y, (int)grid.GridStatus);
             });
 
-            MessagingCenter.Subscribe<GameService, string[]>(this, "GridHitStatus", async (sender, args) =>
+            MessagingCenter.Subscribe<GameService, string[]>(this, "GridHitStatus", (sender, args) =>
             {
                 var x = Convert.ToInt32(args[0]);
                 var y = Convert.ToInt32(args[1]);
                 var status = Convert.ToInt32(args[2]);
-                var grid = Grids.FirstOrDefault(prp => prp.X == x && prp.Y == y);
+                var grid = OpponentGrids.FirstOrDefault(prp => prp.X == x && prp.Y == y);
 
-                if (status > 1)
+                grid.GridStatus = (GridStatusEnum) status;
+                if (status > 2)
                 {
-                    grid.GridStatus = (GridStatusEnum) status;
                     turn = player;
                 }
+                if(status == 4)
+                {
+                    foreach(var tile in grid.Ship.ShipTiles)
+                    {
+                        tile.GridStatus = GridStatusEnum.Sunk;
+                    }
+                }
             });
+
+            MessagingCenter.Subscribe<GameService>(this, "OpponentReady", async (sender) =>
+            {
+                isOpponentReady = true;
+
+                if (IsReady)
+                {
+                    await _gameService.Start(LobbyId);
+                    IsInPlacement = false;
+                }
+            });
+            
+            MessagingCenter.Subscribe<GameService>(this, "StartGame", (sender) =>
+            {
+                isOpponentReady = true;
+                IsInPlacement = false;
+            });
+            
+            MessagingCenter.Subscribe<GameService>(this, "YouWon", async (sender) =>
+            {
+                //increment player wins
+                PopupHelper.DisplayGameOverMessage("You won! :D", "Game Over", LobbyId);
+            });
+            
         }
 
-        public override void InitializeAsync()
+        public override async void InitializeAsync()
         {
-            _gameService.Connect();
+            await _gameService.Connect();
 
+            var lobby = await _lobbyService.GetLobbyById(LobbyId);
+            await _gameService.JoinGame(LobbyId);
+
+            if (lobby.PlayerOne == _settingsService.UserName)
+            {
+                player = "p1";
+
+                base.InitializeAsync();
+                return;
+            }
+
+            player = "p2";
             base.InitializeAsync();
         }
 
         private async Task Shoot()
         {
+            if(player != turn)
+            {
+                PopupHelper.DisplayErrorMessage("Wait for your turn!", "Game Message");
+                return;
+            }
+            if (SelectedOpponentTile.IsShip)
+            {
+                PopupHelper.DisplayErrorMessage("Select another tile, this one is already hit!", "Game Message");
+            }
             await _gameService.Shoot(LobbyId, SelectedOpponentTile.X, SelectedOpponentTile.Y, player);
         }
 
@@ -209,7 +279,15 @@ namespace Battleships.MobileApp.ViewModels.Game
 
         private async Task Ready()
         {
-            IsInPlacement = false;
+            isPlayerReady = true;
+            if(isPlayerReady && isOpponentReady)
+            {
+                await _gameService.Start(LobbyId);
+                IsInPlacement = false;
+                return;
+            }
+
+            await _gameService.Ready(LobbyId);
         }
 
         private void CreateOpponentGrid()

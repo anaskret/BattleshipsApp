@@ -20,20 +20,32 @@ namespace Battleships.MobileApp.Services.Lobby
             _settingsService = DependencyService.Get<ISettingsService>();
         }
 
-        public async Task CreateLobby(LobbyModel lobby)
+        public async Task<LobbyModel> CreateLobby(LobbyModel lobby)
         {
-            await _requestProvider.PostAsync(GlobalSetting.Instance.DefaultEndpoint + "lobbies/create", lobby, _settingsService.AuthAccessToken);
+            var responseLobby = await _requestProvider.PostAsync(GlobalSetting.Instance.DefaultEndpoint + "/lobby", lobby, _settingsService.AuthAccessToken);
+            return responseLobby;
         }
         
         public async Task UpdateLobby(LobbyModel lobby)
         {
-            await _requestProvider.PutAsync(GlobalSetting.Instance.DefaultEndpoint + "lobbies/create", lobby, _settingsService.AuthAccessToken);
+            await _requestProvider.PutAsync(GlobalSetting.Instance.DefaultEndpoint + "/lobby", lobby, _settingsService.AuthAccessToken);
         }
 
         public async Task<LobbyModel> GetLobbyById(int id)
         {
-            var response = await _requestProvider.GetAsync<LobbyModel>(GlobalSetting.Instance.DefaultEndpoint + $"/lobbies/get?id={id}", _settingsService.AuthAccessToken);
+            var response = await _requestProvider.GetAsync<LobbyModel>(GlobalSetting.Instance.DefaultEndpoint + $"/lobby?id={id}", _settingsService.AuthAccessToken);
             return response;
+        } 
+        
+        public async Task<LobbyModel> GetLobbyByName(string name)
+        {
+            var response = await _requestProvider.GetAsync<LobbyModel>(GlobalSetting.Instance.DefaultEndpoint + $"/lobbyByName?name={name}", _settingsService.AuthAccessToken);
+            return response;
+        }
+
+        public async Task Delete(int id)
+        {
+            await _requestProvider.DeleteAsync(GlobalSetting.Instance.DefaultEndpoint + $"/lobby?id{id}", _settingsService.AuthAccessToken);
         }
     }
 }

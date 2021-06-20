@@ -1,4 +1,5 @@
-﻿using Battleships.MobileApp.Models;
+﻿using Battleships.MobileApp.Helpers;
+using Battleships.MobileApp.Models;
 using Battleships.MobileApp.Services.Lobby;
 using Battleships.MobileApp.Services.Settings;
 using Battleships.MobileApp.ViewModels.Base;
@@ -33,33 +34,18 @@ namespace Battleships.MobileApp.ViewModels.Lobby
 
         private async Task Join()
         {
-            var lobby = new LobbyModel() { Id = 2, Name = "Test", PlayerOne = "Test" };
+            var lobby = await _lobbyService.GetLobbyByName(LobbyName);
 
             if(lobby.PlayerTwo != null)
             {
-                DisplayErrorMessage("Lobby is full");
+                PopupHelper.DisplayErrorMessage("Lobby is full", "Failed to Join");
                 return;
             }
 
-            //lobby.PlayerTwo = _settingsService.UserName;
-            //await _lobbyService.UpdateLobby(lobby);
+            lobby.PlayerTwo = _settingsService.UserName;
+            await _lobbyService.UpdateLobby(lobby);
 
             await Shell.Current.GoToAsync($"//{nameof(GamePage)}?LobbyId={lobby.Id}");
-        }
-
-        private async void DisplayErrorMessage(string message)
-        {
-            var pop = new PopupInfo
-            {
-                BindingContext = new PopupInfoViewModel()
-                {
-                    Message = message,
-                    Title = "Failed to Join"
-                }
-            };
-
-            await App.Current.MainPage.Navigation.PushPopupAsync(pop, true);
-            return;
         }
     }
 }

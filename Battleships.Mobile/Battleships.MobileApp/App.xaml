@@ -13,7 +13,8 @@
             <Color x:Key="LoginEntryBackground">#25ADB8CA</Color>
 
             <Color x:Key="Red">#DA262F</Color>
-
+            <Color x:Key="DarkBlue">#172F55</Color>
+            
             <Color x:Key="Accent">#96d1ff</Color>
             
             <Style TargetType="Button">

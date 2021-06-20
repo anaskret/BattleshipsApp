@@ -202,7 +202,7 @@
                                     CornerRadius="10" BackgroundColor="DimGray" />
                             <Button Command="{Binding ReadyCommand}" Text="Ready" IsEnabled="{Binding IsReady}" 
                                     HeightRequest="50" WidthRequest="100" 
-                                    CornerRadius="10" BackgroundColor="Red" />
+                                    CornerRadius="10" BackgroundColor="{StaticResource DarkBlue}" />
                         </StackLayout>
                     </StackLayout>
                     <StackLayout IsVisible="{Binding IsInPlacement, Converter={StaticResource inverseBool}, Mode=TwoWay}">

@@ -15,7 +15,9 @@ namespace Battleships.MobileApp
             Routing.RegisterRoute(nameof(RegisterPage), typeof(RegisterPage));
             Routing.RegisterRoute(nameof(GamePage), typeof(GamePage));
             Routing.RegisterRoute(nameof(NewLobby), typeof(NewLobby));
+            Routing.RegisterRoute(nameof(JoinLobby), typeof(JoinLobby));
             Routing.RegisterRoute(nameof(PhotosListPage), typeof(PhotosListPage));
+            Routing.RegisterRoute(nameof(LeaderboardPage), typeof(LeaderboardPage));
         }
 
         private async void OnMenuItemClicked(object sender, EventArgs e)

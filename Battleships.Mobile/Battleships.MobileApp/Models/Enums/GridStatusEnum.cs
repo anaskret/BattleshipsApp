@@ -8,6 +8,7 @@ namespace Battleships.MobileApp.Models.Enums
     {
         NotHit = 1,
         Hit = 2,
+        ShipHit = 2,
         Sunk = 3
     }
 }

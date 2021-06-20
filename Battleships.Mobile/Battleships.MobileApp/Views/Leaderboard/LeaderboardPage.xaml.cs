@@ -10,9 +10,9 @@ using Xamarin.Forms.Xaml;
 namespace Battleships.MobileApp.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class JoinLobby : ContentPage
+    public partial class LeaderboardPage : ContentPage
     {
-        public JoinLobby()
+        public LeaderboardPage()
         {
             InitializeComponent();
         }
