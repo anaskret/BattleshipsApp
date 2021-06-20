@@ -4,7 +4,7 @@ using Battleships.Repositories.Repositories.Generic;
 using Battleships.Repositories.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
