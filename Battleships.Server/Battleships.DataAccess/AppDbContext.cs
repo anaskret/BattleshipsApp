@@ -23,17 +23,6 @@ namespace Battleships.DataAccess
         public DbSet<Lobby> Lobbies { get; set; }
         public DbSet<Player> Players { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            base.OnModelCreating(builder);
-
-            builder.Entity<Lobby>()
-                .HasOne(e => e.Player)
-                .WithMany(p => p.Lobbies)
-                .HasForeignKey(e => e.PlayerOneId)
-                .HasForeignKey(e => e.PlayerTwoId);
-
-        }
 
     }
 }

@@ -11,7 +11,7 @@ namespace Battleships.Models.Dtos
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string PlayerOneId { get; set; }
-        public string PlayerTwoId { get; set; }
+        public string PlayerOne { get; set; }
+        public string PlayerTwo { get; set; }
     }
 }
