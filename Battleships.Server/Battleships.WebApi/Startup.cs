@@ -93,8 +93,6 @@ namespace Battleships.WebApi
             services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-            services.AddTransient<IExampleRepository, ExampleRepository>();
-
             services.AddScoped<Services.Services.Interfaces.IAuthenticationService, Services.Services.AuthenticationService>();
             services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
 

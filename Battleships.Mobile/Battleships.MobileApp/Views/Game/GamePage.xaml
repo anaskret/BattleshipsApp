@@ -35,13 +35,19 @@
                             <DataTrigger TargetType="Frame" Binding="{Binding IsShip}" Value="true">
                                 <Setter Property="BackgroundColor" Value="LightBlue"/>
                             </DataTrigger>
-                            <DataTrigger TargetType="Frame" Binding="{Binding GridStatus}" Value="{x:Static enums:GridStatusEnum.Hit}">
+                            <DataTrigger TargetType="Frame" Binding="{Binding GridStatus}" Value="{x:Static enums:GridStatusEnum.ShipHit}">
                                 <Setter Property="BackgroundColor" Value="IndianRed"/>
                             </DataTrigger>
+                            <DataTrigger TargetType="Frame" Binding="{Binding GridStatus}" Value="{x:Static enums:GridStatusEnum.Sunk}">
+                                <Setter Property="BackgroundColor" Value="DarkRed"/>
+                            </DataTrigger>
                         </Frame.Triggers>
-                        <Label Text="x" VerticalOptions="Center" HorizontalOptions="Center">
+                        <Label Text="x" FontSize="10" VerticalOptions="Center" HorizontalOptions="Center">
                             <Label.Triggers>
                                 <DataTrigger TargetType="Label" Binding="{Binding GridStatus}" Value="{x:Static enums:GridStatusEnum.Hit}">
+                                    <Setter Property="IsVisible" Value="true"/>
+                                </DataTrigger>
+                                <DataTrigger TargetType="Label" Binding="{Binding GridStatus}" Value="{x:Static enums:GridStatusEnum.Sunk}">
                                     <Setter Property="IsVisible" Value="true"/>
                                 </DataTrigger>
                             </Label.Triggers>
@@ -227,13 +233,19 @@
                                     <Frame WidthRequest="10" HeightRequest="10"
                                            BorderColor="Black" BackgroundColor="White">
                                         <Frame.Triggers>
-                                            <DataTrigger TargetType="Frame" Binding="{Binding GridStatus}" Value="{x:Static enums:GridStatusEnum.Hit}">
+                                            <DataTrigger TargetType="Frame" Binding="{Binding GridStatus}" Value="{x:Static enums:GridStatusEnum.ShipHit}">
                                                 <Setter Property="BackgroundColor" Value="IndianRed"/>
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Frame" Binding="{Binding GridStatus}" Value="{x:Static enums:GridStatusEnum.Sunk}">
+                                                <Setter Property="BackgroundColor" Value="DarkRed"/>
                                             </DataTrigger>
                                         </Frame.Triggers>
                                         <Label Text="x" VerticalOptions="Center" HorizontalOptions="Center">
                                             <Label.Triggers>
                                                 <DataTrigger TargetType="Label" Binding="{Binding GridStatus}" Value="{x:Static enums:GridStatusEnum.Hit}">
+                                                    <Setter Property="IsVisible" Value="true"/>
+                                                </DataTrigger>
+                                                <DataTrigger TargetType="Label" Binding="{Binding GridStatus}" Value="{x:Static enums:GridStatusEnum.Sunk}">
                                                     <Setter Property="IsVisible" Value="true"/>
                                                 </DataTrigger>
                                             </Label.Triggers>

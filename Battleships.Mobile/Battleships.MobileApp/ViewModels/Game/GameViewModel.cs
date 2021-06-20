@@ -154,19 +154,20 @@ namespace Battleships.MobileApp.ViewModels.Game
                     { 
                         grid.Ship.ShipTiles.ForEach(prp => prp.GridStatus = GridStatusEnum.Sunk);
                         grid.GridStatus = GridStatusEnum.Sunk;
+                        DestroyTilesAroundShip(grid.Ship.IsVertical, Grids, grid.Ship.ShipTiles.FirstOrDefault(), grid.Ship.ShipTiles.Count);
                     }
 
                     await _gameService.GridStatus(LobbyId, x, y, (int)grid.GridStatus);
 
                     foreach(var ship in Ships)
                     {
-                        if(ship.ShipTiles.Any(prp => prp.GridStatus == GridStatusEnum.Sunk))
+                        if(ship.ShipTiles.Any(prp => prp.GridStatus != GridStatusEnum.Sunk))
                         {
-                            await _gameService.Victory(LobbyId);
-                            PopupHelper.DisplayGameOverMessage("You lost :(", "Game Over", LobbyId);
                             return;
                         }
                     }
+                    await _gameService.Victory(LobbyId);
+                    PopupHelper.DisplayGameOverMessage("You lost :(", "Game Over", LobbyId);
                     return;
                 }
                 turn = player;
@@ -184,11 +185,14 @@ namespace Battleships.MobileApp.ViewModels.Game
                 grid.GridStatus = (GridStatusEnum) status;
                 if (status > 2)
                 {
+                    grid.IsShip = true;
                     turn = player;
                 }
                 if(status == 4)
                 {
-                    foreach(var tile in grid.Ship.ShipTiles)
+                    DestroyTilesAroundShip(grid.Ship.IsVertical, OpponentGrids, grid.Ship.ShipTiles.FirstOrDefault(), grid.Ship.ShipTiles.Count);
+
+                    foreach (var tile in grid.Ship.ShipTiles)
                     {
                         tile.GridStatus = GridStatusEnum.Sunk;
                     }
@@ -258,7 +262,7 @@ namespace Battleships.MobileApp.ViewModels.Game
             Grids = new ObservableCollection<GridModel>();
             Ships = new List<ShipModel>();
 
-            CarriersLeftCount = 1;
+            CarriersLeftCount = 2;
             /*BattleshipsLeftCount = 2;
             CruisersLeftCount = 3;
             SubmarinesLeftCount = 4;
@@ -507,6 +511,52 @@ namespace Battleships.MobileApp.ViewModels.Game
                 SelectedTile.Ship.IsVertical = !SelectedTile.Ship.IsVertical;
 
                 //if(CarriersLeftCount <= 0 && BattleshipsLeftCount <= 0 && CruisersLeftCount <= 0 && SubmarinesLeftCount <= 0 && DestroyersLeftCount <= 0)
+            }
+        }
+
+        private void DestroyTilesAroundShip(bool isVertical,ObservableCollection<GridModel> targetGrid,  GridModel startTile, int size)
+        {
+            if (isVertical)
+            {
+                var beforeTile = targetGrid.FirstOrDefault(prp => prp.X == startTile.X && prp.Y == startTile.Y - 1);
+                var afterTile = targetGrid.FirstOrDefault(prp => prp.X == startTile.X && prp.Y == startTile.Y + size);
+
+                if(beforeTile != null)
+                    beforeTile.GridStatus = GridStatusEnum.Sunk;
+                if(afterTile != null)
+                    afterTile.GridStatus = GridStatusEnum.Sunk;
+
+                for(int i = -1; i <= size; i++)
+                {
+                    var tile1 = targetGrid.FirstOrDefault(prp => prp.X == startTile.X + 1 && prp.Y == startTile.Y + i);
+                    var tile2 = targetGrid.FirstOrDefault(prp => prp.X == startTile.X - 1 && prp.Y == startTile.Y + i);
+                
+                    if(tile1 != null)
+                        tile1.GridStatus = GridStatusEnum.Sunk;
+                    if(tile2 != null)
+                    tile2.GridStatus = GridStatusEnum.Sunk;
+                }
+
+                return;
+            }
+
+            var beforeXTile = targetGrid.FirstOrDefault(prp => prp.X == startTile.X - 1 && prp.Y == startTile.Y);
+            var afterXTile = targetGrid.FirstOrDefault(prp => prp.X == startTile.X + size && prp.Y == startTile.Y);
+            
+            if (beforeXTile != null)
+                beforeXTile.GridStatus = GridStatusEnum.Hit;
+            if (afterXTile != null)
+                afterXTile.GridStatus = GridStatusEnum.Hit;
+
+            for (int i = -1; i <= size; i++)
+            {
+                var tile1 = targetGrid.FirstOrDefault(prp => prp.X == startTile.X + i && prp.Y == startTile.Y + 1);
+                var tile2 = targetGrid.FirstOrDefault(prp => prp.X == startTile.X + i && prp.Y == startTile.Y - 1);
+                
+                if(tile1 != null)
+                    tile1.GridStatus = GridStatusEnum.Hit;
+                if(tile2 != null)
+                    tile2.GridStatus = GridStatusEnum.Hit;
             }
         }
 
