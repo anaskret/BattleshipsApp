@@ -17,7 +17,10 @@ namespace Battleships.WebApi.Extensions.AutoMapper
         {
             CreateMap<DataAccess.Migrations.Example, ExampleDto>();
             CreateMap<ExampleDto, DataAccess.Migrations.Example>();
-
+            CreateMap<Lobby, LobbyDto>();
+            CreateMap<LobbyDto, Lobby>();
+            CreateMap<Player, PlayerDto>();
+            CreateMap<PlayerDto, Player>();
         }
     }
 }
