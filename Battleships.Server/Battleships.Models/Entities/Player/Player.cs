@@ -10,5 +10,6 @@ namespace Battleships.Models.Entities.Player
     {
         public string Username { get; set; }
         public int Wins { get; set; }
+
     }
 }

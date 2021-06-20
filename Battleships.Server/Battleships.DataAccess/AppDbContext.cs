@@ -1,4 +1,7 @@
-﻿using Battleships.Models.Entities.Example;
+﻿using Battleships.Models.Dtos;
+using Battleships.Models.Entities.Example;
+using Battleships.Models.Entities.Lobby;
+using Battleships.Models.Entities.Player;
 using Battleships.Models.Entities.User;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -17,5 +20,9 @@ namespace Battleships.DataAccess
         }
 
         public DbSet<Example> Examples { get; set; }
+        public DbSet<Lobby> Lobbies { get; set; }
+        public DbSet<Player> Players { get; set; }
+
+
     }
 }
