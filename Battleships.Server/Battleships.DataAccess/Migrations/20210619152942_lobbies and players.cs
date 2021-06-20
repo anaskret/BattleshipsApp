@@ -13,8 +13,8 @@ namespace Battleships.DataAccess.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PlayerOneId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PlayerTwoId = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    PlayerOne = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PlayerTwo = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
