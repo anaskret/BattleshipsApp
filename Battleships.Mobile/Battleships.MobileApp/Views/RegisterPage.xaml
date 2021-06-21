@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Battleships.MobileApp.Views.RegisterPage"
+             xmlns:vm="clr-namespace:Battleships.MobileApp.ViewModels.Register"
+             Shell.FlyoutBehavior="Disabled">
+    <ContentPage.BindingContext>
+        <vm:RegisterViewModel/>
+    </ContentPage.BindingContext>
+    <Grid RowDefinitions="Auto, *">
+        <Label Text="Register" FontSize="36"
+               Margin="0, 40, 0, 0"
+               HorizontalOptions="Center"/>
+        <StackLayout Grid.Row="1" VerticalOptions="Center">
+            <StackLayout Padding="40, 0, 40, 40" Spacing="10">
+                <Frame CornerRadius="10"
+                           OutlineColor="{StaticResource LoginEntryOutline}"
+                           BackgroundColor="{StaticResource LoginEntryBackground}"
+                           WidthRequest="360"
+                           HeightRequest="64"
+                           Padding="0">
+                    <Entry Text="{Binding UserName}" Placeholder="UserName"
+                               VerticalOptions="Center"
+                               HeightRequest="64" WidthRequest="360" 
+                               HorizontalOptions="StartAndExpand"/>
+                </Frame>
+                <Frame CornerRadius="10"
+                           OutlineColor="{StaticResource LoginEntryOutline}"
+                           BackgroundColor="{StaticResource LoginEntryBackground}"
+                           WidthRequest="360"
+                           HeightRequest="64"
+                           Padding="0">
+                    <Entry Text="{Binding Password}" 
+                               VerticalOptions="Center" Placeholder="Password" IsPassword="true"
+                               HeightRequest="64" WidthRequest="360"
+                               HorizontalOptions="StartAndExpand"/>
+                </Frame>
+                <Frame CornerRadius="10"
+                           OutlineColor="{StaticResource LoginEntryOutline}"
+                           BackgroundColor="{StaticResource LoginEntryBackground}"
+                           WidthRequest="360"
+                           HeightRequest="64"
+                           Padding="0">
+                    <Entry Text="{Binding ConfirmPassword}" Placeholder="Confirm Password" IsPassword="true"
+                                   VerticalOptions="Center"
+                                   HeightRequest="64" WidthRequest="360"
+                                   HorizontalOptions="StartAndExpand"/>
+                </Frame>
+            </StackLayout>
+            <StackLayout Padding="40, 0">
+                <Button Command="{Binding RegisterCommand}" Text="Register" HeightRequest="64" 
+                                WidthRequest="360" CornerRadius="10" BackgroundColor="{StaticResource DarkBlue}" />
+            </StackLayout>
+        </StackLayout>
+    </Grid>
+</ContentPage>

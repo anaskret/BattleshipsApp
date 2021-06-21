@@ -1,4 +1,5 @@
-﻿using Battleships.Models.Models;
+﻿using Battleships.Models.Dtos;
+using Battleships.Models.Models;
 using Battleships.Repositories.Repositories.Interfaces;
 using Battleships.Services.Services.Interfaces;
 //using Microsoft.AspNetCore.Authentication;
@@ -13,10 +14,12 @@ namespace Battleships.Services.Services
     public class AuthenticationService : IAuthenticationService
     {
         private readonly IAuthenticationRepository _repository;
+        private readonly IPlayerService _player;
 
-        public AuthenticationService(IAuthenticationRepository repository)
+        public AuthenticationService(IAuthenticationRepository repository, IPlayerService player)
         {
             _repository = repository;
+            _player = player;
         }
         public async Task<LoginResponse> LoginUser(LoginModel model)
         {
@@ -25,7 +28,16 @@ namespace Battleships.Services.Services
 
         public async Task<RegisterResponse> RegisterUser(RegisterModel model)
         {
-            return await _repository.Register(model);
+            var response = await _repository.Register(model);
+
+            PlayerDto newPlayer = new PlayerDto()
+            {
+                Username = model.Username,
+                Wins = 0
+            };
+            await _player.CreatePlayer(newPlayer);
+
+            return response;
         }
 
     }

@@ -1,0 +1,271 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Battleships.MobileApp.ViewModels.Game"
+             xmlns:helpers="clr-namespace:Battleships.MobileApp.Helpers"
+             xmlns:enums="clr-namespace:Battleships.MobileApp.Models.Enums"
+             xmlns:flv="clr-namespace:DLToolkit.Forms.Controls;assembly=DLToolkit.Forms.Controls.FlowListView"
+             x:Class="Battleships.MobileApp.Views.GamePage"
+             Title="Battleships">
+    <ContentPage.BindingContext>
+        <vm:GameViewModel/>
+    </ContentPage.BindingContext>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <helpers:InverseBoolConverter x:Key="inverseBool" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <StackLayout>
+        <flv:FlowListView FlowColumnCount="10" SeparatorVisibility="None" HasUnevenRows="false"
+                          SelectedItem="{Binding SelectedTile}"
+	                      FlowItemTappedCommand="{Binding ItemTappedCommand}" FlowLastTappedItem="{Binding SelectedTile}"
+	                      FlowItemsSource="{Binding Grids}"
+                          Margin="5, 0">
+            <flv:FlowListView.Header>
+                <Label Text="Your board" 
+                       FontSize="24" 
+                       Margin="0, 10, 0, 20"
+                       HorizontalOptions="Center"/>
+            </flv:FlowListView.Header>
+            <flv:FlowListView.FlowColumnTemplate>
+                <DataTemplate>
+                    <Frame WidthRequest="10" HeightRequest="10" Padding="0"
+                           BorderColor="Black" BackgroundColor="White">
+                        <Frame.Triggers>
+                            <DataTrigger TargetType="Frame" Binding="{Binding IsShip}" Value="true">
+                                <Setter Property="BackgroundColor" Value="LightBlue"/>
+                            </DataTrigger>
+                            <DataTrigger TargetType="Frame" Binding="{Binding GridStatus}" Value="{x:Static enums:GridStatusEnum.ShipHit}">
+                                <Setter Property="BackgroundColor" Value="IndianRed"/>
+                            </DataTrigger>
+                            <DataTrigger TargetType="Frame" Binding="{Binding GridStatus}" Value="{x:Static enums:GridStatusEnum.Sunk}">
+                                <Setter Property="BackgroundColor" Value="DarkRed"/>
+                            </DataTrigger>
+                        </Frame.Triggers>
+                        <Label Text="x" FontSize="20" IsVisible="False"
+                               VerticalOptions="Center" HorizontalOptions="Center">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding GridStatus, Mode=TwoWay}" Value="{x:Static enums:GridStatusEnum.Hit}">
+                                    <Setter Property="IsVisible" Value="true"/>
+                                </DataTrigger>
+                                <DataTrigger TargetType="Label" Binding="{Binding GridStatus, Mode=TwoWay}" Value="{x:Static enums:GridStatusEnum.ShipHit}">
+                                    <Setter Property="IsVisible" Value="true"/>
+                                </DataTrigger>
+                                <DataTrigger TargetType="Label" Binding="{Binding GridStatus, Mode=TwoWay}" Value="{x:Static enums:GridStatusEnum.Sunk}">
+                                    <Setter Property="IsVisible" Value="true"/>
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                    </Frame>
+                </DataTemplate>
+            </flv:FlowListView.FlowColumnTemplate>
+            <flv:FlowListView.Footer>
+                <StackLayout>
+                    <StackLayout IsVisible="{Binding IsInPlacement, Mode=TwoWay}">
+                        <Label Text="Place your ships"
+                               FontSize="16"
+                               HorizontalOptions="Center"
+                               Margin="0, 10, 0, 10"/>
+                        <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand" Spacing="0">
+                            <Label VerticalOptions="Center" Margin="10, 0">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding CarriersLeftCount}"/>
+                                        <Span Text="x"/>
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <Frame WidthRequest="10" HeightRequest="10"
+                                   BorderColor="Black" BackgroundColor="White">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding PlaceCarrierCommand}"/>
+                                </Frame.GestureRecognizers>
+                            </Frame>
+                            <Frame WidthRequest="10" HeightRequest="10"
+                                   BorderColor="Black" BackgroundColor="White">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding PlaceCarrierCommand}"/>
+                                </Frame.GestureRecognizers>
+                            </Frame>
+                            <Frame WidthRequest="10" HeightRequest="10"
+                                   BorderColor="Black" BackgroundColor="White">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding PlaceCarrierCommand}"/>
+                                </Frame.GestureRecognizers>
+                            </Frame>
+                            <Frame WidthRequest="10" HeightRequest="10"
+                                   BorderColor="Black" BackgroundColor="White">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding PlaceCarrierCommand}"/>
+                                </Frame.GestureRecognizers>
+                            </Frame>
+                            <Frame WidthRequest="10" HeightRequest="10"
+                                   BorderColor="Black" BackgroundColor="White">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding PlaceCarrierCommand}"/>
+                                </Frame.GestureRecognizers>
+                            </Frame>
+                        </StackLayout>
+                        <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand" Spacing="0">
+                            <Label VerticalOptions="Center" Margin="10, 0">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding BattleshipsLeftCount}"/>
+                                        <Span Text="x"/>
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <Frame WidthRequest="10" HeightRequest="10"
+                                   BorderColor="Black" BackgroundColor="White">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding PlaceBattleshipCommand}"/>
+                                </Frame.GestureRecognizers>
+                            </Frame>
+                            <Frame WidthRequest="10" HeightRequest="10"
+                                   BorderColor="Black" BackgroundColor="White">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding PlaceBattleshipCommand}"/>
+                                </Frame.GestureRecognizers>
+                            </Frame>
+                            <Frame WidthRequest="10" HeightRequest="10"
+                                   BorderColor="Black" BackgroundColor="White">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding PlaceBattleshipCommand}"/>
+                                </Frame.GestureRecognizers>
+                            </Frame>
+                            <Frame WidthRequest="10" HeightRequest="10"
+                                   BorderColor="Black" BackgroundColor="White">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding PlaceBattleshipCommand}"/>
+                                </Frame.GestureRecognizers>
+                            </Frame>
+                        </StackLayout>
+                        <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand" Spacing="0">
+                            <Label VerticalOptions="Center" Margin="10, 0">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding CruisersLeftCount}"/>
+                                        <Span Text="x"/>
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <Frame WidthRequest="10" HeightRequest="10"
+                                       BorderColor="Black" BackgroundColor="White">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding PlaceCruiserCommand}"/>
+                                </Frame.GestureRecognizers>
+                            </Frame>
+                            <Frame WidthRequest="10" HeightRequest="10"
+                                       BorderColor="Black" BackgroundColor="White">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding PlaceCruiserCommand}"/>
+                                </Frame.GestureRecognizers>
+                            </Frame>
+                            <Frame WidthRequest="10" HeightRequest="10"
+                                       BorderColor="Black" BackgroundColor="White">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding PlaceCruiserCommand}"/>
+                                </Frame.GestureRecognizers>
+                            </Frame>
+                        </StackLayout>
+                        <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand" Spacing="0">
+                            <Label VerticalOptions="Center" Margin="10, 0">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding SubmarinesLeftCount}"/>
+                                        <Span Text="x"/>
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <Frame WidthRequest="10" HeightRequest="10"
+                                       BorderColor="Black" BackgroundColor="White">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding PlaceSubmarineCommand}"/>
+                                </Frame.GestureRecognizers>
+                            </Frame>
+                            <Frame WidthRequest="10" HeightRequest="10"
+                                       BorderColor="Black" BackgroundColor="White">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding PlaceSubmarineCommand}"/>
+                                </Frame.GestureRecognizers>
+                            </Frame>
+                        </StackLayout>
+                        <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand" Spacing="0">
+                            <Label VerticalOptions="Center" Margin="10, 0">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding DestroyersLeftCount}"/>
+                                        <Span Text="x"/>
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <Frame WidthRequest="10" HeightRequest="10"
+                                       BorderColor="Black" BackgroundColor="White">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding PlaceDestroyerCommand}"/>
+                                </Frame.GestureRecognizers>
+                            </Frame>
+                        </StackLayout>
+                        <StackLayout Margin="10" Orientation="Horizontal" HorizontalOptions="Center">
+                            <Button Command="{Binding ClearCommand}" Text="Clear" 
+                                    HeightRequest="50" WidthRequest="100"
+                                    CornerRadius="10" BackgroundColor="DimGray" />
+                            <Button Command="{Binding ReadyCommand}" Text="Ready" IsEnabled="{Binding IsReady}" 
+                                    HeightRequest="50" WidthRequest="100" 
+                                    CornerRadius="10" BackgroundColor="{StaticResource DarkBlue}" />
+                        </StackLayout>
+                    </StackLayout>
+                    <StackLayout IsVisible="{Binding IsInPlacement, Converter={StaticResource inverseBool}, Mode=TwoWay}">
+                        <flv:FlowListView FlowColumnCount="10" SeparatorVisibility="None" HasUnevenRows="false"
+                                          SelectedItem="{Binding SelectedOpponentTile}"
+                                          FlowLastTappedItem="{Binding SelectedOpponentTile}"
+	                                      FlowItemsSource="{Binding OpponentGrids}"
+                                          Margin="5, 0">
+                            <flv:FlowListView.Header>
+                                <StackLayout Margin="0, 10, 0, 0">
+                                    <Line X2="8000"
+                                          Stroke="Black"
+                                          Margin="0, 20"/>
+                                    <Label Text="Opponents board"
+                                           FontSize="24" 
+                                           Margin="0, 0, 0, 10"
+                                           HorizontalOptions="Center"/>
+                                </StackLayout>
+                            </flv:FlowListView.Header>
+                            <flv:FlowListView.FlowColumnTemplate>
+                                <DataTemplate>
+                                    <Frame WidthRequest="10" HeightRequest="10"
+                                           Padding="0"
+                                           BorderColor="Black" BackgroundColor="White">
+                                        <Frame.Triggers>
+                                            <DataTrigger TargetType="Frame" Binding="{Binding GridStatus}" Value="{x:Static enums:GridStatusEnum.ShipHit}">
+                                                <Setter Property="BackgroundColor" Value="IndianRed"/>
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Frame" Binding="{Binding GridStatus}" Value="{x:Static enums:GridStatusEnum.Sunk}">
+                                                <Setter Property="BackgroundColor" Value="DarkRed"/>
+                                            </DataTrigger>
+                                        </Frame.Triggers>
+                                        <Label Text="x" FontSize="20" 
+                                               VerticalOptions="Center" HorizontalOptions="Center" IsVisible="false">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label" Binding="{Binding GridStatus, Mode=TwoWay}" Value="{x:Static enums:GridStatusEnum.Hit}">
+                                                    <Setter Property="IsVisible" Value="true"/>
+                                                </DataTrigger>
+                                                <DataTrigger TargetType="Label" Binding="{Binding GridStatus, Mode=TwoWay}" Value="{x:Static enums:GridStatusEnum.ShipHit}">
+                                                    <Setter Property="IsVisible" Value="true"/>
+                                                </DataTrigger>
+                                                <DataTrigger TargetType="Label" Binding="{Binding GridStatus, Mode=TwoWay}" Value="{x:Static enums:GridStatusEnum.Sunk}">
+                                                    <Setter Property="IsVisible" Value="true"/>
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                    </Frame>
+                                </DataTemplate>
+                            </flv:FlowListView.FlowColumnTemplate>
+                        </flv:FlowListView>
+                    </StackLayout>
+                </StackLayout>
+            </flv:FlowListView.Footer>
+        </flv:FlowListView>
+    </StackLayout>
+</ContentPage>
