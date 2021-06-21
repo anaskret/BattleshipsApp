@@ -21,31 +21,23 @@ namespace Battleships.WebApi.Hubs
 
             public async Task Ready(int lobbyId)
             {
-                //await Clients.OthersInGroup(lobbyId.ToString()).Ready(lobbyId);
-                await Clients.All.Ready(lobbyId);
+                await Clients.OthersInGroup(lobbyId.ToString()).Ready(lobbyId);
+               
             }
 
             public async Task Start(int lobbyId)
             {
-                //await Clients.OthersInGroup(lobbyId.ToString()).Start(lobbyId);
-                await Clients.All.Start(lobbyId);
+                await Clients.OthersInGroup(lobbyId.ToString()).Start(lobbyId);
             }
 
             public async Task Victory(int lobbyId)
             {
-                //await Clients.OthersInGroup(lobbyId.ToString()).Victory(lobbyId);
-                await Clients.All.Victory(lobbyId);
+               await Clients.OthersInGroup(lobbyId.ToString()).Victory(lobbyId);
             }
 
             public async Task Shoot(int lobbyId, int x, int y, string player)
             {
-                var turn = "p1";
-                if (player == "p1")
-                    turn = "p2";
-                else
-                    turn = "p1";
-
-                await Clients.All.Shoot(lobbyId, x, y, turn);
+                await Clients.OthersInGroup(lobbyId.ToString()).Shoot(lobbyId, x, y, player);
             }
 
             public async Task GridStatus(int lobbyId, int x, int y, int status)
