@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Battleships.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20210619152942_lobbies and players")]
-    partial class lobbiesandplayers
+    [Migration("20210621153349_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -46,10 +46,10 @@ namespace Battleships.DataAccess.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PlayerOneId")
+                    b.Property<string>("PlayerOne")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PlayerTwoId")
+                    b.Property<string>("PlayerTwo")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");

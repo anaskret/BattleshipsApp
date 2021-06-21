@@ -21,35 +21,33 @@ namespace Battleships.WebApi.Hubs
 
             public async Task Ready(int lobbyId)
             {
-                //await Clients.OthersInGroup(lobbyId.ToString()).Ready(lobbyId);
-                await Clients.All.Ready(lobbyId);
+                await Clients.OthersInGroup(lobbyId.ToString()).Ready(lobbyId);
+               
             }
 
             public async Task Start(int lobbyId)
             {
-                //await Clients.OthersInGroup(lobbyId.ToString()).Start(lobbyId);
-                await Clients.All.Start(lobbyId);
+                await Clients.OthersInGroup(lobbyId.ToString()).Start(lobbyId);
             }
 
             public async Task Victory(int lobbyId)
             {
-                //await Clients.OthersInGroup(lobbyId.ToString()).Victory(lobbyId);
-                await Clients.All.Victory(lobbyId);
+               await Clients.OthersInGroup(lobbyId.ToString()).Victory(lobbyId);
             }
 
             public async Task Shoot(int lobbyId, int x, int y, string player)
-            
-                await Clients.All.Shoot(lobbyId, x, y, player);
+            {
+                await Clients.OthersInGroup(lobbyId.ToString()).Shoot(lobbyId, x, y, player);
             }
 
             public async Task GridStatus(int lobbyId, int x, int y, int status)
             {
-                await Clients.All.GridStatus(lobbyId, x, y, status);
+                await Clients.OthersInGroup(lobbyId.ToString()).GridStatus(lobbyId, x, y, status);
             }
         
             public async Task GridStatusShipSunk(int lobbyId, int[] x, int[] y, int status, bool isVertical)
             {
-                await Clients.All.GridStatusShipSunk(lobbyId, x, y, status, isVertical);
+                await Clients.OthersInGroup(lobbyId.ToString()).GridStatusShipSunk(lobbyId, x, y, status, isVertical);
             }
         }
     }

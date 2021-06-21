@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Battleships.DataAccess.Migrations;
 using Battleships.Models.Dtos;
 using Battleships.Models.Entities.Example;
 using Battleships.Models.Entities.Lobby;
@@ -15,8 +14,7 @@ namespace Battleships.WebApi.Extensions.AutoMapper
     {
         public AutoMapperProfiles()
         {
-            CreateMap<DataAccess.Migrations.Example, ExampleDto>();
-            CreateMap<ExampleDto, DataAccess.Migrations.Example>();
+
             CreateMap<Lobby, LobbyDto>();
             CreateMap<LobbyDto, Lobby>();
             CreateMap<Player, PlayerDto>();
