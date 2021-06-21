@@ -39,7 +39,7 @@ namespace Battleships.WebApi.Hubs
 
             public async Task Shoot(int lobbyId, int x, int y, string player)
             
-                await Clients.All.Shoot(lobbyId, x, y, turn);
+                await Clients.All.Shoot(lobbyId, x, y, player);
             }
 
             public async Task GridStatus(int lobbyId, int x, int y, int status)
