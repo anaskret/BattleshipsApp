@@ -305,14 +305,14 @@ namespace Battleships.MobileApp.ViewModels.Game
             Ships = new List<ShipModel>();
 
             CarriersLeftCount = 1;
-            /*BattleshipsLeftCount = 2;
+            BattleshipsLeftCount = 2;
             CruisersLeftCount = 3;
             SubmarinesLeftCount = 4;
-            DestroyersLeftCount = 5;*/
-            BattleshipsLeftCount = 0;
+            DestroyersLeftCount = 5;
+            /*BattleshipsLeftCount = 0;
             CruisersLeftCount = 0;
             SubmarinesLeftCount = 0;
-            DestroyersLeftCount = 0;
+            DestroyersLeftCount = 0;*/
 
             for (int i = 0; i < 10; i++)
             {
