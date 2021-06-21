@@ -30,14 +30,7 @@ namespace Battleships.MobileApp.Services.Authorization
 
         public async Task Register(AuthModel model)
         {
-            try
-            {
-                await _requestProvider.PostAsync(GlobalSetting.Instance.DefaultEndpoint + "/register", model);
-            }
-            catch(Exception ex)
-            {
-
-            }
+            await _requestProvider.PostAsync(GlobalSetting.Instance.DefaultEndpoint + "/register", model);
         }
     }
 }

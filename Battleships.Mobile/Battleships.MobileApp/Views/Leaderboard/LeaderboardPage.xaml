@@ -8,7 +8,7 @@
         <vm:LeaderboardViewModel/>
     </ContentPage.BindingContext>
     <StackLayout>
-        <Grid ColumnDefinitions="Auto, 50, Auto" HorizontalOptions="CenterAndExpand" Margin="20">
+        <Grid ColumnDefinitions="100, 100, *" HorizontalOptions="CenterAndExpand" Margin="20">
             <Label Text="Username" FontAttributes="Bold" FontSize="20"/>
             <Label Grid.Column="2" Text="Wins" FontAttributes="Bold" FontSize="20"/>
         </Grid>
@@ -16,9 +16,9 @@
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
-                        <Grid ColumnDefinitions="Auto, 100, Auto" HorizontalOptions="CenterAndExpand">
-                            <Label Text="{Binding UserName}" FontSize="20"/>
-                            <Label Grid.Column="2" Text="{Binding Wins}" FontSize="20"/>
+                        <Grid ColumnDefinitions="100, 100, 100" HorizontalOptions="CenterAndExpand">
+                            <Label Text="{Binding UserName}" FontSize="20" HorizontalOptions="StartAndExpand"/>
+                            <Label Grid.Column="2" Text="{Binding Wins}" FontSize="20" HorizontalOptions="End"/>
                         </Grid>
                     </ViewCell>
                 </DataTemplate>
