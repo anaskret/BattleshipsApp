@@ -16,6 +16,19 @@ namespace Battleships.MobileApp.ViewModels.Leaderboard
         private ObservableCollection<PlayerModel> _leaderboard;
         public ObservableCollection<PlayerModel> Leaderboard{ get => _leaderboard; set => SetProperty(ref _leaderboard, value); }
 
+        private PlayerModel _selectedItem;
+        public PlayerModel SelectedItem
+        {
+            get => _selectedItem;
+            set
+            {
+                if (value == null)
+                    return;
+                _selectedItem = null;
+                OnPropertyChanged();
+            }
+        }
+
         public LeaderboardViewModel()
         {
             _playerService = DependencyService.Get<IPlayerService>();

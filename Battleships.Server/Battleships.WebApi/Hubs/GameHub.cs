@@ -52,6 +52,11 @@ namespace Battleships.WebApi.Hubs
             {
                 await Clients.All.GridStatus(lobbyId, x, y, status);
             }
+        
+            public async Task GridStatusShipSunk(int lobbyId, int[] x, int[] y, int status, bool isVertical)
+            {
+                await Clients.All.GridStatusShipSunk(lobbyId, x, y, status, isVertical);
+            }
         }
     }
 

@@ -43,6 +43,12 @@ namespace Battleships.MobileApp.Services.Game
                 MessagingCenter.Send(this, "GridHitStatus", args);
             });
             
+            _connection.On<int, int[], int[], int, bool>("GridStatusShipSunk", (lobbyId, x, y, status, isVertical) =>
+            {
+                string[] args = { string.Join("", x), string.Join("", y), status.ToString(), isVertical.ToString() };
+                MessagingCenter.Send(this, "GridHitStatusShipSunk", args);
+            });
+            
             _connection.On<int>("Ready", (lobbyId) =>
             {
                 MessagingCenter.Send(this, "OpponentReady");
@@ -85,6 +91,11 @@ namespace Battleships.MobileApp.Services.Game
         public async Task GridStatus(int lobbyId, int x, int y, int status)
         {
              await _connection.InvokeAsync("GridStatus", lobbyId, x, y, status);
+        }
+        
+        public async Task GridStatusShipSunk(int lobbyId, int[] x, int[] y, int status, bool isVertical)
+        {
+             await _connection.InvokeAsync("GridStatusShipSunk", lobbyId, x, y, status, isVertical);
         }
 
         public async Task JoinGame(int lobbyId)

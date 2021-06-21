@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Battleships.MobileApp.ViewModels.Base;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,13 @@ namespace Battleships.MobileApp.Views
         public LeaderboardPage()
         {
             InitializeComponent();
+        }
+
+        protected override void OnAppearing()
+        {
+            (BindingContext as ViewModelBase).InitializeAsync();
+
+            base.OnAppearing();
         }
     }
 }

@@ -28,6 +28,8 @@ namespace Battleships.Services.Services
 
         public async Task<RegisterResponse> RegisterUser(RegisterModel model)
         {
+            var response = await _repository.Register(model);
+
             PlayerDto newPlayer = new PlayerDto()
             {
                 Username = model.Username,
@@ -35,7 +37,7 @@ namespace Battleships.Services.Services
             };
             await _player.CreatePlayer(newPlayer);
 
-            return await _repository.Register(model);
+            return response;
         }
 
     }

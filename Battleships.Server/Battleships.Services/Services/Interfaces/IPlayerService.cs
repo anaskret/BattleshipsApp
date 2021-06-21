@@ -12,7 +12,7 @@ namespace Battleships.Services.Services.Interfaces
         Task<List<PlayerDto>> GetAll();
         Task<PlayerDto> GetPlayerByName(string name);
         Task<PlayerDto> CreatePlayer(PlayerDto player);
-        Task UpdatePlayer(PlayerDto player);
+        Task UpdatePlayer(string name);
         Task DeletePlayer(int id);
     }
 }

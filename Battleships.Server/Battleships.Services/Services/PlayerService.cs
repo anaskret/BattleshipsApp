@@ -50,8 +50,11 @@ namespace Battleships.Services.Services
             return _mapper.Map<PlayerDto>(await _playerRepository.GetByNameAsync(name));
         }
 
-        public async Task UpdatePlayer(PlayerDto player)
+        public async Task UpdatePlayer(string name)
         {
+            var player = await _playerRepository.GetByNameAsync(name);
+            player.Wins++;
+
             await _playerRepository.UpdateAsync(_mapper.Map<Player>(player));
         }
 

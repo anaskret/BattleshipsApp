@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Battleships.WebApi.Controllers
 {
+    [Authorize]
     public class LobbyController : Controller
     {
         private readonly ILobbyService _lobbyService;

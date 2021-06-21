@@ -2,20 +2,27 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Battleships.MobileApp.ViewModels.Leaderboard"
-             x:Class="Battleships.MobileApp.Views.LeaderboardPage">
+             x:Class="Battleships.MobileApp.Views.LeaderboardPage"
+             Title="Leaderboard">
     <ContentPage.BindingContext>
         <vm:LeaderboardViewModel/>
     </ContentPage.BindingContext>
-    <ListView ItemsSource="{Binding Leaderboard}">
-        <ListView.ItemTemplate>
-            <DataTemplate>
-                <ViewCell>
-                    <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
-                        <Label Text="{Binding UserName}"/>
-                        <Label Text="{Binding Wins}"/>
-                    </StackLayout>
-                </ViewCell>
-            </DataTemplate>
-        </ListView.ItemTemplate>
-    </ListView>
+    <StackLayout>
+        <Grid ColumnDefinitions="Auto, 50, Auto" HorizontalOptions="CenterAndExpand" Margin="20">
+            <Label Text="Username" FontAttributes="Bold" FontSize="20"/>
+            <Label Grid.Column="2" Text="Wins" FontAttributes="Bold" FontSize="20"/>
+        </Grid>
+        <ListView ItemsSource="{Binding Leaderboard}" SeparatorVisibility="None" SelectedItem="{Binding SelectedItem}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <Grid ColumnDefinitions="Auto, 100, Auto" HorizontalOptions="CenterAndExpand">
+                            <Label Text="{Binding UserName}" FontSize="20"/>
+                            <Label Grid.Column="2" Text="{Binding Wins}" FontSize="20"/>
+                        </Grid>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </StackLayout>
 </ContentPage>

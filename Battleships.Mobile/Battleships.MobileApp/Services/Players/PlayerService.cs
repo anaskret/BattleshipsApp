@@ -22,7 +22,7 @@ namespace Battleships.MobileApp.Services.Players
 
         public async Task<List<PlayerModel>> GetLeaderboard()
         {
-            return await _requestProvider.GetAsync<List<PlayerModel>>(GlobalSetting.Instance.DefaultEndpoint + $"/player?userName={_settingsService.UserName}", _settingsService.AuthAccessToken);
+            return await _requestProvider.GetAsync<List<PlayerModel>>(GlobalSetting.Instance.DefaultEndpoint + $"/ranking", _settingsService.AuthAccessToken);
         }
 
         public async Task Update()

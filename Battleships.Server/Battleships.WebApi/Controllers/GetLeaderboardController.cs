@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace Battleships.WebApi.Controllers
 {
+    [Authorize]
     public class GetLeaderboardController : Controller
     {
         private readonly IPlayerService _playerService;

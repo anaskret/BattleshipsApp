@@ -45,7 +45,7 @@ namespace Battleships.MobileApp.Services.Lobby
 
         public async Task Delete(int id)
         {
-            await _requestProvider.DeleteAsync(GlobalSetting.Instance.DefaultEndpoint + $"/lobby?id{id}", _settingsService.AuthAccessToken);
+            await _requestProvider.DeleteAsync(GlobalSetting.Instance.DefaultEndpoint + $"/lobby?id={id}", _settingsService.AuthAccessToken);
         }
     }
 }

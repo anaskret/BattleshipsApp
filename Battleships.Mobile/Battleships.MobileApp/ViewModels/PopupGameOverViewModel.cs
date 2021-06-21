@@ -59,17 +59,17 @@ namespace Battleships.MobileApp.ViewModels
         {
             try
             {
+                await _gameService.Connect();
                 await _gameService.LeaveGame(LobbyId);
-                await _gameService.Disconnect();
                 await _lobbyService.Delete(LobbyId);
 
-                await Shell.Current.GoToAsync($"//{nameof(AboutPage)}");
-                await App.Current.MainPage.Navigation.PopPopupAsync(true);
+                await Shell.Current.Navigation.PopToRootAsync();
+                await Shell.Current.Navigation.PopPopupAsync(true);
             }
             catch(Exception ex)
             {
-                await Shell.Current.GoToAsync($"//{nameof(AboutPage)}");
-                await App.Current.MainPage.Navigation.PopPopupAsync(true);
+                await Shell.Current.Navigation.PopToRootAsync();
+                await Shell.Current.Navigation.PopPopupAsync(true);
             }
         }
     }
