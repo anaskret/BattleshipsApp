@@ -9,7 +9,9 @@ namespace Battleships.MobileApp.Services.Lobby
     public interface ILobbyService
     {
         Task<LobbyModel> GetLobbyById(int id);
-        Task CreateLobby(LobbyModel lobby);
+        Task<LobbyModel> GetLobbyByName(string name);
+        Task<LobbyModel> CreateLobby(LobbyModel lobby);
         Task UpdateLobby(LobbyModel lobby);
+        Task Delete(int id);
     }
 }

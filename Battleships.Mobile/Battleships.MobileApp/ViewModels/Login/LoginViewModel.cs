@@ -1,4 +1,5 @@
-﻿using Battleships.MobileApp.Models.Authentication;
+﻿using Battleships.MobileApp.Helpers;
+using Battleships.MobileApp.Models.Authentication;
 using Battleships.MobileApp.Services.Authorization;
 using Battleships.MobileApp.Services.Game;
 using Battleships.MobileApp.ViewModels.Base;
@@ -38,7 +39,7 @@ namespace Battleships.MobileApp.ViewModels
             {
                 if(string.IsNullOrEmpty(UserName) || string.IsNullOrEmpty(Password))
                 {
-                    DisplayErrorMessage("Fill in Username and Password");
+                    PopupHelper.DisplayErrorMessage("Fill in Username and Password", "Login Failed");
                     return;
                 }
 
@@ -46,7 +47,7 @@ namespace Battleships.MobileApp.ViewModels
             }
             catch(Exception ex)
             {
-                DisplayErrorMessage(ex.Message);
+                PopupHelper.DisplayErrorMessage(ex.Message, "Login Failed");
                 return;
             }
 
@@ -57,21 +58,6 @@ namespace Battleships.MobileApp.ViewModels
         {
             // Prefixing with `//` switches to a different navigation stack instead of pushing to the active one
             await Shell.Current.GoToAsync($"{nameof(RegisterPage)}");
-        }
-
-        private async void DisplayErrorMessage(string message)
-        {
-            var pop = new PopupInfo
-            {
-                BindingContext = new PopupInfoViewModel()
-                {
-                    Message = message,
-                    Title = "Login Failed"
-                }
-            };
-
-            await App.Current.MainPage.Navigation.PushPopupAsync(pop, true);
-            return;
         }
     }
 }

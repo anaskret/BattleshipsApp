@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Battleships.WebApi.Controllers
 {
+    [Authorize]
     public class PlayerController : Controller
     {
         private readonly IPlayerService _playerService;
@@ -61,11 +62,11 @@ namespace Battleships.WebApi.Controllers
         }
 
         [HttpPut("api/player")]
-        public async Task<IActionResult> Update([FromBody] PlayerDto player)
+        public async Task<IActionResult> Update([FromBody] string username)
         {
             try
             {
-                await _playerService.UpdatePlayer(player);
+                await _playerService.UpdatePlayer(username);
                 return Ok();
             }
             catch (Exception ex)

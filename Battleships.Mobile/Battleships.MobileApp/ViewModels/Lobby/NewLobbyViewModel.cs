@@ -1,9 +1,11 @@
-﻿using Battleships.MobileApp.Models;
+﻿using Battleships.MobileApp.Helpers;
+using Battleships.MobileApp.Models;
 using Battleships.MobileApp.Services.Lobby;
 using Battleships.MobileApp.Services.Settings;
 using Battleships.MobileApp.ViewModels.Base;
 using Battleships.MobileApp.Views;
 using MvvmHelpers.Commands;
+using Rg.Plugins.Popup.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -32,11 +34,17 @@ namespace Battleships.MobileApp.ViewModels.Lobby
 
         private async Task Create()
         {
-            var lobby = new LobbyModel() { Id = 2, Name = LobbyName, PlayerOne = _settingsService.UserName };//get lobby from api
+            try
+            {
+                var lobby = new LobbyModel() { Name = LobbyName, PlayerOne = _settingsService.UserName };
+                var createdLobby = await _lobbyService.CreateLobby(lobby);
 
-            //await _lobbyService.CreateLobby(lobby);
-
-            await Shell.Current.GoToAsync($"//{nameof(GamePage)}?LobbyId={lobby.Id}");
+                await Shell.Current.GoToAsync($"{nameof(GamePage)}?LobbyId={createdLobby.Id}");
+            }
+            catch(Exception ex)
+            {
+                PopupHelper.DisplayErrorMessage(ex.Message, "Error while creating lobby");
+            }
         }
     }
 }

@@ -27,7 +27,6 @@ namespace Battleships.MobileApp.Services.Game
                 .Build();
         }
 
-
         public async Task Connect()
         {
             if (_connection.State == HubConnectionState.Connected) return;
@@ -36,13 +35,33 @@ namespace Battleships.MobileApp.Services.Game
             {
                 string[] args = { x.ToString(), y.ToString(), player };
                 MessagingCenter.Send(this, "OpponentShot", args);
-                //MessagingCenter.Send(this, "OpponentShot");
             });
             
             _connection.On<int, int, int, int>("GridStatus", (lobbyId, x, y, status) =>
             {
                 string[] args = { x.ToString(), y.ToString(), status.ToString() };
                 MessagingCenter.Send(this, "GridHitStatus", args);
+            });
+            
+            _connection.On<int, int[], int[], int, bool>("GridStatusShipSunk", (lobbyId, x, y, status, isVertical) =>
+            {
+                string[] args = { string.Join("", x), string.Join("", y), status.ToString(), isVertical.ToString() };
+                MessagingCenter.Send(this, "GridHitStatusShipSunk", args);
+            });
+            
+            _connection.On<int>("Ready", (lobbyId) =>
+            {
+                MessagingCenter.Send(this, "OpponentReady");
+            });
+            
+            _connection.On<int>("Start", (lobbyId) =>
+            {
+                MessagingCenter.Send(this, "StartGame");
+            });
+            
+            _connection.On<int>("Victory", (lobbyId) =>
+            {
+                MessagingCenter.Send(this, "YouWon");
             });
 
             try
@@ -72,6 +91,36 @@ namespace Battleships.MobileApp.Services.Game
         public async Task GridStatus(int lobbyId, int x, int y, int status)
         {
              await _connection.InvokeAsync("GridStatus", lobbyId, x, y, status);
+        }
+        
+        public async Task GridStatusShipSunk(int lobbyId, int[] x, int[] y, int status, bool isVertical)
+        {
+             await _connection.InvokeAsync("GridStatusShipSunk", lobbyId, x, y, status, isVertical);
+        }
+
+        public async Task JoinGame(int lobbyId)
+        {
+            await _connection.InvokeAsync("JoinGame", lobbyId);
+        }
+
+        public async Task LeaveGame(int lobbyId)
+        {
+            await _connection.InvokeAsync("LeaveGame", lobbyId);
+        }
+
+        public async Task Ready(int lobbyId)
+        {
+            await _connection.InvokeAsync("Ready", lobbyId);
+        }
+
+        public async Task Start(int lobbyId)
+        {
+            await _connection.InvokeAsync("Start", lobbyId);
+        }
+        
+        public async Task Victory(int lobbyId)
+        {
+            await _connection.InvokeAsync("Victory", lobbyId);
         }
     }
 }

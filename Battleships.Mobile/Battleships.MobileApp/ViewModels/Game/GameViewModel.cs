@@ -1,10 +1,17 @@
-﻿using Battleships.MobileApp.Models;
+﻿using Battleships.MobileApp.Helpers;
+using Battleships.MobileApp.Models;
 using Battleships.MobileApp.Models.Enums;
 using Battleships.MobileApp.Services.Game;
+using Battleships.MobileApp.Services.Lobby;
+using Battleships.MobileApp.Services.Players;
+using Battleships.MobileApp.Services.Settings;
 using Battleships.MobileApp.ViewModels.Base;
+using Battleships.MobileApp.Views;
+using Rg.Plugins.Popup.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Xamarin.Forms;
@@ -15,6 +22,9 @@ namespace Battleships.MobileApp.ViewModels.Game
     public class GameViewModel : ViewModelBase
     {
         private readonly IGameService _gameService;
+        private readonly ILobbyService _lobbyService;
+        private readonly ISettingsService _settingsService;
+        private readonly IPlayerService _playerService;
 
         private GridModel _selectedTile;
         public GridModel SelectedTile 
@@ -24,11 +34,6 @@ namespace Battleships.MobileApp.ViewModels.Game
             {
                 if (value == null)
                     return;
-                /*if (!IsInPlacement)
-                {
-                    _selectedTile = value;
-                    Shoot();
-                }*/
                 else if(IsInPlacement && value.IsShip)
                 {
                     _selectedTile = value;
@@ -51,7 +56,7 @@ namespace Battleships.MobileApp.ViewModels.Game
             get => _selectedOpponentTile;
             set
             {
-                if (value == null || player != turn)
+                if (value == null)
                     return;
                 if (!IsInPlacement)
                 {
@@ -103,6 +108,8 @@ namespace Battleships.MobileApp.ViewModels.Game
             }
         }
 
+        private bool isOpponentReady;
+        private bool isPlayerReady;
         private bool _isReady;
         public bool IsReady { get => _isReady; set => SetProperty(ref _isReady, value); }
 
@@ -120,9 +127,9 @@ namespace Battleships.MobileApp.ViewModels.Game
         public GameViewModel()
         {
             _gameService = DependencyService.Get<IGameService>();
-
-            CreateGrid();
-            CreateOpponentGrid();
+            _lobbyService = DependencyService.Get<ILobbyService>();
+            _settingsService = DependencyService.Get<ISettingsService>();
+            _playerService = DependencyService.Get<IPlayerService>();
 
             PlaceCarrierCommand = new Command(PlaceCarrier);
             PlaceBattleshipCommand = new Command(PlaceBattleship);
@@ -138,17 +145,41 @@ namespace Battleships.MobileApp.ViewModels.Game
                 var y = Convert.ToInt32(args[1]);
                 var grid = Grids.FirstOrDefault(prp => prp.X == x && prp.Y == y);
 
+                grid.GridStatus = GridStatusEnum.Hit;
+
                 if (grid.IsShip)
                 {
-                    grid.GridStatus = GridStatusEnum.Hit;
+                    grid.GridStatus = GridStatusEnum.ShipHit;
+                    await _gameService.GridStatus(LobbyId, x, y, (int)grid.GridStatus);
 
                     if (!grid.Ship.ShipTiles.Any(prp => prp.GridStatus == GridStatusEnum.NotHit))
-                    { 
-                        grid.Ship.ShipTiles.ForEach(prp => prp.GridStatus = GridStatusEnum.Sunk);
+                    {
+                        var shipSize = grid.Ship.ShipTiles.Count;
+                        int[] xCoordinates = new int[shipSize];
+                        int[] yCoordinates = new int[shipSize];
+
+                        for(int i = 0; i < grid.Ship.ShipTiles.Count; i++)
+                        {
+                            grid.Ship.ShipTiles[i].GridStatus = GridStatusEnum.Sunk;
+                            xCoordinates[i] = grid.Ship.ShipTiles[i].X;
+                            yCoordinates[i] = grid.Ship.ShipTiles[i].Y;
+                        }
+
                         grid.GridStatus = GridStatusEnum.Sunk;
+                        DestroyTilesAroundShip(grid.Ship.IsVertical, Grids, grid.Ship.ShipTiles.FirstOrDefault(), grid.Ship.ShipTiles.Count);
+
+                        await _gameService.GridStatusShipSunk(LobbyId, xCoordinates, yCoordinates, (int)grid.GridStatus, grid.Ship.IsVertical);
                     }
 
-                    await _gameService.GridStatus(LobbyId, x, y, (int)grid.GridStatus);
+                    foreach(var ship in Ships)
+                    {
+                        if(ship.ShipTiles.Any(prp => prp.GridStatus != GridStatusEnum.Sunk))
+                        {
+                            return;
+                        }
+                    }
+                    await _gameService.Victory(LobbyId);
+                    PopupHelper.DisplayGameOverMessage("You lost :(", "Game Over", LobbyId);
                     return;
                 }
                 turn = player;
@@ -156,30 +187,115 @@ namespace Battleships.MobileApp.ViewModels.Game
                 await _gameService.GridStatus(LobbyId, x, y, (int)grid.GridStatus);
             });
 
-            MessagingCenter.Subscribe<GameService, string[]>(this, "GridHitStatus", async (sender, args) =>
+            MessagingCenter.Subscribe<GameService, string[]>(this, "GridHitStatus", (sender, args) =>
             {
                 var x = Convert.ToInt32(args[0]);
                 var y = Convert.ToInt32(args[1]);
                 var status = Convert.ToInt32(args[2]);
-                var grid = Grids.FirstOrDefault(prp => prp.X == x && prp.Y == y);
+                var grid = OpponentGrids.FirstOrDefault(prp => prp.X == x && prp.Y == y);
 
-                if (status > 1)
+                grid.GridStatus = (GridStatusEnum) status;
+                if (status > 2)
                 {
-                    grid.GridStatus = (GridStatusEnum) status;
+                    grid.IsShip = true;
                     turn = player;
                 }
+                /*if(status == 4)
+                {
+                    foreach (var tile in grid.Ship.ShipTiles)
+                    {
+                        tile.GridStatus = GridStatusEnum.Sunk;
+                    }
+
+                    DestroyTilesAroundShip(grid.Ship.IsVertical, OpponentGrids, grid.Ship.ShipTiles.FirstOrDefault(), grid.Ship.ShipTiles.Count);
+                }*/
             });
+            
+            MessagingCenter.Subscribe<GameService, string[]>(this, "GridHitStatusShipSunk", (sender, args) =>
+            {
+                var param = args[0];
+                var param1 = args[0].ToArray();
+                int[] x = Array.ConvertAll(args[0].ToArray(), prp => (int)char.GetNumericValue(prp));
+                int[] y = Array.ConvertAll(args[1].ToArray(), prp => (int)char.GetNumericValue(prp));
+                var status = Convert.ToInt32(args[2]);
+                bool isVertical = Convert.ToBoolean(args[3]);
+
+                DestroyTilesAroundOpponentShip(isVertical, x, y, x.Length);
+            });
+
+            MessagingCenter.Subscribe<GameService>(this, "OpponentReady", async (sender) =>
+            {
+                isOpponentReady = true;
+
+                if (IsReady)
+                {
+                    await _gameService.Start(LobbyId);
+                    IsInPlacement = false;
+                }
+            });
+            
+            MessagingCenter.Subscribe<GameService>(this, "StartGame", (sender) =>
+            {
+                isOpponentReady = true;
+                IsInPlacement = false;
+            });
+            
+            MessagingCenter.Subscribe<GameService>(this, "YouWon", async (sender) =>
+            {
+                try
+                {
+                    await _playerService.Update();
+                }
+                catch(Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+
+                PopupHelper.DisplayGameOverMessage("You won! :D", "Game Over", LobbyId);
+            });
+            
         }
 
-        public override void InitializeAsync()
+        public override async void InitializeAsync()
         {
-            _gameService.Connect();
+            CreateGrid();
+            CreateOpponentGrid();
 
-            base.InitializeAsync();
+            try
+            {
+                await _gameService.Connect();
+
+                var lobby = await _lobbyService.GetLobbyById(LobbyId);
+                await _gameService.JoinGame(LobbyId);
+
+                if (lobby.PlayerOne == _settingsService.UserName)
+                {
+                    player = "p1";
+
+                    base.InitializeAsync();
+                    return;
+                }
+
+                player = "p2";
+                base.InitializeAsync();
+            }
+            catch(Exception ex)
+            {
+                await Shell.Current.Navigation.PopToRootAsync();
+            }
         }
 
         private async Task Shoot()
         {
+            if(player != turn)
+            {
+                PopupHelper.DisplayErrorMessage("Wait for your turn!", "Game Message");
+                return;
+            }
+            if (SelectedOpponentTile.IsShip)
+            {
+                PopupHelper.DisplayErrorMessage("Select another tile, this one is already hit!", "Game Message");
+            }
             await _gameService.Shoot(LobbyId, SelectedOpponentTile.X, SelectedOpponentTile.Y, player);
         }
 
@@ -189,14 +305,14 @@ namespace Battleships.MobileApp.ViewModels.Game
             Ships = new List<ShipModel>();
 
             CarriersLeftCount = 1;
-            /*BattleshipsLeftCount = 2;
+            BattleshipsLeftCount = 2;
             CruisersLeftCount = 3;
             SubmarinesLeftCount = 4;
-            DestroyersLeftCount = 5;*/
-            BattleshipsLeftCount = 0;
+            DestroyersLeftCount = 5;
+            /*BattleshipsLeftCount = 0;
             CruisersLeftCount = 0;
             SubmarinesLeftCount = 0;
-            DestroyersLeftCount = 0;
+            DestroyersLeftCount = 0;*/
 
             for (int i = 0; i < 10; i++)
             {
@@ -209,7 +325,15 @@ namespace Battleships.MobileApp.ViewModels.Game
 
         private async Task Ready()
         {
-            IsInPlacement = false;
+            isPlayerReady = true;
+            if(isPlayerReady && isOpponentReady)
+            {
+                await _gameService.Start(LobbyId);
+                IsInPlacement = false;
+                return;
+            }
+
+            await _gameService.Ready(LobbyId);
         }
 
         private void CreateOpponentGrid()
@@ -429,6 +553,127 @@ namespace Battleships.MobileApp.ViewModels.Game
                 SelectedTile.Ship.IsVertical = !SelectedTile.Ship.IsVertical;
 
                 //if(CarriersLeftCount <= 0 && BattleshipsLeftCount <= 0 && CruisersLeftCount <= 0 && SubmarinesLeftCount <= 0 && DestroyersLeftCount <= 0)
+            }
+        }
+
+        private void DestroyTilesAroundShip(bool isVertical,ObservableCollection<GridModel> targetGrid,  GridModel startTile, int size)
+        {
+            if (isVertical)
+            {
+                var beforeTile = targetGrid.FirstOrDefault(prp => prp.X == startTile.X && prp.Y == startTile.Y - 1);
+                var afterTile = targetGrid.FirstOrDefault(prp => prp.X == startTile.X && prp.Y == startTile.Y + size);
+
+                if(beforeTile != null)
+                    beforeTile.GridStatus = GridStatusEnum.Hit;
+                if(afterTile != null)
+                    afterTile.GridStatus = GridStatusEnum.Hit;
+
+                for(int i = -1; i <= size; i++)
+                {
+                    var tile1 = targetGrid.FirstOrDefault(prp => prp.X == startTile.X + 1 && prp.Y == startTile.Y + i);
+                    var tile2 = targetGrid.FirstOrDefault(prp => prp.X == startTile.X - 1 && prp.Y == startTile.Y + i);
+                
+                    if(tile1 != null)
+                        tile1.GridStatus = GridStatusEnum.Hit;
+                    if(tile2 != null)
+                    tile2.GridStatus = GridStatusEnum.Hit;
+                }
+
+                return;
+            }
+
+            var beforeXTile = targetGrid.FirstOrDefault(prp => prp.X == startTile.X - 1 && prp.Y == startTile.Y);
+            var afterXTile = targetGrid.FirstOrDefault(prp => prp.X == startTile.X + size && prp.Y == startTile.Y);
+            
+            if (beforeXTile != null)
+                beforeXTile.GridStatus = GridStatusEnum.Hit;
+            if (afterXTile != null)
+                afterXTile.GridStatus = GridStatusEnum.Hit;
+
+            for (int i = -1; i <= size; i++)
+            {
+                var tile1 = targetGrid.FirstOrDefault(prp => prp.X == startTile.X + i && prp.Y == startTile.Y + 1);
+                var tile2 = targetGrid.FirstOrDefault(prp => prp.X == startTile.X + i && prp.Y == startTile.Y - 1);
+                
+                if(tile1 != null)
+                    tile1.GridStatus = GridStatusEnum.Hit;
+                if(tile2 != null)
+                    tile2.GridStatus = GridStatusEnum.Hit;
+            }
+        }
+        
+        private void DestroyTilesAroundOpponentShip(bool isVertical, int[] x, int[] y, int size)
+        {
+            if (isVertical)
+            {
+                var beforeTile = OpponentGrids.FirstOrDefault(prp => prp.X == x[0]  && prp.Y == y[0] - 1);
+                var beforeTile1 = OpponentGrids.FirstOrDefault(prp => prp.X == x[0] - 1  && prp.Y == y[0] - 1);
+                var beforeTile2 = OpponentGrids.FirstOrDefault(prp => prp.X == x[0] + 1  && prp.Y == y[0] - 1);
+                var afterTile = OpponentGrids.FirstOrDefault(prp => prp.X == x[0] && prp.Y == y[0] + size);
+                var afterTile1 = OpponentGrids.FirstOrDefault(prp => prp.X == x[0] - 1 && prp.Y == y[0] + size);
+                var afterTile2 = OpponentGrids.FirstOrDefault(prp => prp.X == x[0] + 1 && prp.Y == y[0] + size);
+
+                if(beforeTile != null)
+                    beforeTile.GridStatus = GridStatusEnum.Hit;
+                if (beforeTile1 != null)
+                    beforeTile1.GridStatus = GridStatusEnum.Hit;
+                if(beforeTile2 != null)
+                    beforeTile2.GridStatus = GridStatusEnum.Hit;
+                if(afterTile != null)
+                    afterTile.GridStatus = GridStatusEnum.Hit;
+                if(afterTile1 != null)
+                    afterTile1.GridStatus = GridStatusEnum.Hit;
+                if(afterTile2 != null)
+                    afterTile2.GridStatus = GridStatusEnum.Hit;
+
+                for(int i = 0; i <= size; i++)
+                {
+                    var tile1 = OpponentGrids.FirstOrDefault(prp => prp.X == x[i] + 1 && prp.Y == y[i]);
+                    var tile2 = OpponentGrids.FirstOrDefault(prp => prp.X == x[i] - 1 && prp.Y == y[i]);
+                
+                    if(tile1 != null)
+                        tile1.GridStatus = GridStatusEnum.Hit;
+                    if(tile2 != null)
+                        tile2.GridStatus = GridStatusEnum.Hit;
+                }
+
+                return;
+            }
+
+            var beforeXTile = OpponentGrids.FirstOrDefault(prp => prp.X == x[0] - 1 && prp.Y == y[0]);
+            var beforeXTile1 = OpponentGrids.FirstOrDefault(prp => prp.X == x[0] - 1 && prp.Y == y[0] - 1);
+            var beforeXTile2 = OpponentGrids.FirstOrDefault(prp => prp.X == x[0] - 1 && prp.Y == y[0] + 1);
+            var afterXTile = OpponentGrids.FirstOrDefault(prp => prp.X == x[0] + size && prp.Y == y[0]);
+            var afterXTile1 = OpponentGrids.FirstOrDefault(prp => prp.X == x[0] + size && prp.Y == y[0] + 1);
+            var afterXTile2 = OpponentGrids.FirstOrDefault(prp => prp.X == x[0] + size && prp.Y == y[0] - 1);
+
+            if (beforeXTile != null)
+                beforeXTile.GridStatus = GridStatusEnum.Hit;
+            if (beforeXTile1 != null)
+                beforeXTile1.GridStatus = GridStatusEnum.Hit;
+            if (beforeXTile2 != null)
+                beforeXTile2.GridStatus = GridStatusEnum.Hit;
+            if (afterXTile != null)
+                afterXTile.GridStatus = GridStatusEnum.Hit;
+            if (afterXTile1 != null)
+                afterXTile1.GridStatus = GridStatusEnum.Hit;
+            if (afterXTile2 != null)
+                afterXTile2.GridStatus = GridStatusEnum.Hit;
+
+            if (beforeXTile != null)
+                beforeXTile.GridStatus = GridStatusEnum.Hit;
+            if (afterXTile != null)
+                afterXTile.GridStatus = GridStatusEnum.Hit;
+
+            for (int i = 0; i <= size; i++)
+            {
+                var tile1 = OpponentGrids.FirstOrDefault(prp => prp.X == x[i] && prp.Y == y[i] + 1);
+                var tile2 = OpponentGrids.FirstOrDefault(prp => prp.X == x[i] && prp.Y == y[i] - 1);
+                
+                if(tile1 != null)
+                    tile1.GridStatus = GridStatusEnum.Hit;
+                if(tile2 != null)
+                    tile2.GridStatus = GridStatusEnum.Hit;
             }
         }
 

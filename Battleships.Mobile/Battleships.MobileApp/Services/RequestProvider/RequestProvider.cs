@@ -67,10 +67,6 @@ namespace Battleships.MobileApp.Services.RequestProvider
             {
                 return data;
             }
-            catch (Exception ex)
-            {
-
-            }
 
             return data;
         }

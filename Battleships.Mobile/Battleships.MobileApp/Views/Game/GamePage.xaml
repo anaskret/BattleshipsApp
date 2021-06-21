@@ -29,19 +29,29 @@
             </flv:FlowListView.Header>
             <flv:FlowListView.FlowColumnTemplate>
                 <DataTemplate>
-                    <Frame WidthRequest="10" HeightRequest="10"
+                    <Frame WidthRequest="10" HeightRequest="10" Padding="0"
                            BorderColor="Black" BackgroundColor="White">
                         <Frame.Triggers>
                             <DataTrigger TargetType="Frame" Binding="{Binding IsShip}" Value="true">
                                 <Setter Property="BackgroundColor" Value="LightBlue"/>
                             </DataTrigger>
-                            <DataTrigger TargetType="Frame" Binding="{Binding GridStatus}" Value="{x:Static enums:GridStatusEnum.Hit}">
+                            <DataTrigger TargetType="Frame" Binding="{Binding GridStatus}" Value="{x:Static enums:GridStatusEnum.ShipHit}">
                                 <Setter Property="BackgroundColor" Value="IndianRed"/>
                             </DataTrigger>
+                            <DataTrigger TargetType="Frame" Binding="{Binding GridStatus}" Value="{x:Static enums:GridStatusEnum.Sunk}">
+                                <Setter Property="BackgroundColor" Value="DarkRed"/>
+                            </DataTrigger>
                         </Frame.Triggers>
-                        <Label Text="x" VerticalOptions="Center" HorizontalOptions="Center">
+                        <Label Text="x" FontSize="20" IsVisible="False"
+                               VerticalOptions="Center" HorizontalOptions="Center">
                             <Label.Triggers>
-                                <DataTrigger TargetType="Label" Binding="{Binding GridStatus}" Value="{x:Static enums:GridStatusEnum.Hit}">
+                                <DataTrigger TargetType="Label" Binding="{Binding GridStatus, Mode=TwoWay}" Value="{x:Static enums:GridStatusEnum.Hit}">
+                                    <Setter Property="IsVisible" Value="true"/>
+                                </DataTrigger>
+                                <DataTrigger TargetType="Label" Binding="{Binding GridStatus, Mode=TwoWay}" Value="{x:Static enums:GridStatusEnum.ShipHit}">
+                                    <Setter Property="IsVisible" Value="true"/>
+                                </DataTrigger>
+                                <DataTrigger TargetType="Label" Binding="{Binding GridStatus, Mode=TwoWay}" Value="{x:Static enums:GridStatusEnum.Sunk}">
                                     <Setter Property="IsVisible" Value="true"/>
                                 </DataTrigger>
                             </Label.Triggers>
@@ -202,7 +212,7 @@
                                     CornerRadius="10" BackgroundColor="DimGray" />
                             <Button Command="{Binding ReadyCommand}" Text="Ready" IsEnabled="{Binding IsReady}" 
                                     HeightRequest="50" WidthRequest="100" 
-                                    CornerRadius="10" BackgroundColor="Red" />
+                                    CornerRadius="10" BackgroundColor="{StaticResource DarkBlue}" />
                         </StackLayout>
                     </StackLayout>
                     <StackLayout IsVisible="{Binding IsInPlacement, Converter={StaticResource inverseBool}, Mode=TwoWay}">
@@ -225,15 +235,26 @@
                             <flv:FlowListView.FlowColumnTemplate>
                                 <DataTemplate>
                                     <Frame WidthRequest="10" HeightRequest="10"
+                                           Padding="0"
                                            BorderColor="Black" BackgroundColor="White">
                                         <Frame.Triggers>
-                                            <DataTrigger TargetType="Frame" Binding="{Binding GridStatus}" Value="{x:Static enums:GridStatusEnum.Hit}">
+                                            <DataTrigger TargetType="Frame" Binding="{Binding GridStatus}" Value="{x:Static enums:GridStatusEnum.ShipHit}">
                                                 <Setter Property="BackgroundColor" Value="IndianRed"/>
                                             </DataTrigger>
+                                            <DataTrigger TargetType="Frame" Binding="{Binding GridStatus}" Value="{x:Static enums:GridStatusEnum.Sunk}">
+                                                <Setter Property="BackgroundColor" Value="DarkRed"/>
+                                            </DataTrigger>
                                         </Frame.Triggers>
-                                        <Label Text="x" VerticalOptions="Center" HorizontalOptions="Center">
+                                        <Label Text="x" FontSize="20" 
+                                               VerticalOptions="Center" HorizontalOptions="Center" IsVisible="false">
                                             <Label.Triggers>
-                                                <DataTrigger TargetType="Label" Binding="{Binding GridStatus}" Value="{x:Static enums:GridStatusEnum.Hit}">
+                                                <DataTrigger TargetType="Label" Binding="{Binding GridStatus, Mode=TwoWay}" Value="{x:Static enums:GridStatusEnum.Hit}">
+                                                    <Setter Property="IsVisible" Value="true"/>
+                                                </DataTrigger>
+                                                <DataTrigger TargetType="Label" Binding="{Binding GridStatus, Mode=TwoWay}" Value="{x:Static enums:GridStatusEnum.ShipHit}">
+                                                    <Setter Property="IsVisible" Value="true"/>
+                                                </DataTrigger>
+                                                <DataTrigger TargetType="Label" Binding="{Binding GridStatus, Mode=TwoWay}" Value="{x:Static enums:GridStatusEnum.Sunk}">
                                                     <Setter Property="IsVisible" Value="true"/>
                                                 </DataTrigger>
                                             </Label.Triggers>

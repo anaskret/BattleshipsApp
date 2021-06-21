@@ -1,4 +1,5 @@
-﻿using Battleships.MobileApp.Models.Authentication;
+﻿using Battleships.MobileApp.Helpers;
+using Battleships.MobileApp.Models.Authentication;
 using Battleships.MobileApp.Services.Authorization;
 using Battleships.MobileApp.ViewModels.Base;
 using Battleships.MobileApp.Views;
@@ -37,17 +38,18 @@ namespace Battleships.MobileApp.ViewModels.Register
         {
             if (string.IsNullOrWhiteSpace(Password) || string.IsNullOrWhiteSpace(ConfirmPassword))
             {
-                DisplayErrorMessage("Password cannot be empty");
+
+                PopupHelper.DisplayErrorMessage("Password cannot be empty", "Incorrect Password");
                 return;
             }
             if (!Password.Equals(ConfirmPassword))
             {
-                DisplayErrorMessage("Passwords are different");
+                PopupHelper.DisplayErrorMessage("Passwords are different", "Incorrect Password");
                 return;
             }
             if (Password.Length < 8 || !Password.Any(char.IsDigit) || !Password.Any(char.IsUpper))
             {
-                DisplayErrorMessage("Password has to have at least 8 characters, including 1 digit and 1 upper letter");
+                PopupHelper.DisplayErrorMessage("Password has to have at least 8 characters, including 1 digit and 1 upper letter", "Incorrect Password");
                 return;
             }
 
@@ -57,26 +59,11 @@ namespace Battleships.MobileApp.ViewModels.Register
             }
             catch(Exception ex)
             {
-                DisplayErrorMessage(ex.Message);
+                PopupHelper.DisplayErrorMessage(ex.Message, "Something went wrong");
                 return;
             }
 
             await Shell.Current.GoToAsync($"//{nameof(LoginPage)}");
-        }
-
-        private async void DisplayErrorMessage(string message)
-        {
-            var pop = new PopupInfo
-            {
-                BindingContext = new PopupInfoViewModel()
-                {
-                    Message = message,
-                    Title = "Incorrect Password"
-                }
-            };
-
-            await App.Current.MainPage.Navigation.PushPopupAsync(pop, true);
-            return;
         }
     }
 }

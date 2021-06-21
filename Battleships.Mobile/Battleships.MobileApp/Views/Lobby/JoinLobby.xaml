@@ -2,12 +2,17 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Battleships.MobileApp.ViewModels.Lobby"
-             x:Class="Battleships.MobileApp.Views.Lobby.JoinLobby">
+             x:Class="Battleships.MobileApp.Views.JoinLobby"
+             Title="Join Lobby">
     <ContentPage.BindingContext>
         <vm:JoinLobbyViewModel/>
     </ContentPage.BindingContext>
-    
-    <Frame VerticalOptions="Center" HorizontalOptions="Center" Margin="20">
+
+    <Frame VerticalOptions="Center"
+           HorizontalOptions="Center" 
+           Margin="20" 
+           CornerRadius="30"
+           BorderColor="LightGray">
         <StackLayout Margin="5">
             <Frame CornerRadius="10"
                    OutlineColor="{StaticResource LoginEntryOutline}"
