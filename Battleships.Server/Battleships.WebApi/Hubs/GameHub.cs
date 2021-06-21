@@ -38,13 +38,7 @@ namespace Battleships.WebApi.Hubs
             }
 
             public async Task Shoot(int lobbyId, int x, int y, string player)
-            {
-                var turn = "p1";
-                if (player == "p1")
-                    turn = "p2";
-                else
-                    turn = "p1";
-
+            
                 await Clients.All.Shoot(lobbyId, x, y, turn);
             }
 
