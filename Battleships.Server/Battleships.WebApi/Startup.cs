@@ -44,7 +44,8 @@ namespace Battleships.WebApi
 
             services.AddControllers();
 
-            services.AddSignalR();
+            services.AddSignalR()
+                    .AddAzureSignalR(Configuration.GetConnectionString("SignalRConnection"));
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                             .AddEntityFrameworkStores<AppDbContext>()
@@ -117,6 +118,7 @@ namespace Battleships.WebApi
             //app.UseHttpsRedirection();
 
             app.UseRouting();
+            app.UseFileServer();
 
             app.UseCors(config => config
             .AllowAnyOrigin()
