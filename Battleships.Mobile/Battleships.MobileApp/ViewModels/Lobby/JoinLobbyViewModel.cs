@@ -47,7 +47,7 @@ namespace Battleships.MobileApp.ViewModels.Lobby
                 lobby.PlayerTwo = _settingsService.UserName;
                 await _lobbyService.UpdateLobby(lobby);
 
-                await Shell.Current.GoToAsync($"//{nameof(GamePage)}?LobbyId={lobby.Id}");
+                await Shell.Current.GoToAsync($"{nameof(GamePage)}?LobbyId={lobby.Id}");
             }
             catch(Exception ex)
             {

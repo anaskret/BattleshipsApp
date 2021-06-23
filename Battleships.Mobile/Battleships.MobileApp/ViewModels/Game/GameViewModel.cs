@@ -199,7 +199,14 @@ namespace Battleships.MobileApp.ViewModels.Game
                 {
                     grid.IsShip = true;
                     turn = player;
+                    return;
                 }
+                if(player == "p1")
+                {
+                    turn = "p2";
+                    return;
+                }
+                turn = "p1";
                 /*if(status == 4)
                 {
                     foreach (var tile in grid.Ship.ShipTiles)
@@ -305,10 +312,10 @@ namespace Battleships.MobileApp.ViewModels.Game
             Ships = new List<ShipModel>();
 
             CarriersLeftCount = 1;
-            BattleshipsLeftCount = 2;
-            CruisersLeftCount = 3;
-            SubmarinesLeftCount = 4;
-            DestroyersLeftCount = 5;
+            BattleshipsLeftCount = 1;
+            CruisersLeftCount = 1;
+            SubmarinesLeftCount = 1;
+            DestroyersLeftCount = 1;
             /*BattleshipsLeftCount = 0;
             CruisersLeftCount = 0;
             SubmarinesLeftCount = 0;
