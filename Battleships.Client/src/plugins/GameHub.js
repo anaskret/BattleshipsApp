@@ -7,7 +7,7 @@ import {
 export default {
     install(Vue) {
         const connection = new HubConnectionBuilder()
-            .withUrl("http://192.168.0.16:5000/api/gameHub", {
+            .withUrl("https://battleshipswebapi20210621191952.azurewebsites.net/api/gameHub", {
                 skipNegotiation: true,
                 transport: HttpTransportType.WebSockets,
             })

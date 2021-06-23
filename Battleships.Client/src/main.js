@@ -20,8 +20,7 @@ Vue.config.productionTip = false;
 Vue.use(Vuelidate);
 
 Vue.use(lobbyHub);
-
-axios.defaults.baseURL = "http://192.168.0.16:5000";
+axios.defaults.baseURL = "https://battleshipswebapi20210621191952.azurewebsites.net/";
 Vue.prototype.$http = axios;
 
 new Vue({
