@@ -2,7 +2,7 @@
     <v-row justify="space-around">
         <v-col cols="auto">
             <v-dialog
-                v-model="isOpen"
+                v-model="open"
                 transition="dialog-top-transition"
                 max-width="800"
             >
@@ -12,31 +12,14 @@
                 <template v-slot:default="dialog">
                     <v-card class="menu-container">
                         <v-card-actions class="justify-end">
-                            <v-btn text @click="dialog.value = false">
+                            <v-btn text @click="closeMenu(dialog)">
                                 <font-awesome-icon icon="times" size="2x" />
                             </v-btn>
                         </v-card-actions>
                         <button class="btn" @click="$emit('start-new-game')">
-                            New Game
+                            Play Game
                         </button>
-                        <button
-                            class="btn"
-                            :class="{
-                                disable: options.resume.isDisabled,
-                            }"
-                            @click="$emit('resume-game')"
-                        >
-                            Resume
-                        </button>
-                        <button
-                            class="btn"
-                            @click="$emit('join-game')"
-                            :class="{
-                                disable: options.join.isDisabled,
-                            }"
-                        >
-                            Join Game
-                        </button>
+                        <button class="btn" @click="logout()">Logout</button>
                     </v-card>
                 </template>
             </v-dialog>
@@ -52,9 +35,27 @@ export default {
         options: Object,
     },
     methods: {
+        closeMenu(dialog) {
+            this.$emit("close-dialog");
+            dialog.value = false;
+        },
         disableOptions() {
-            this.options.resume.isDisabled = true;
             this.options.join.isDisabled = true;
+        },
+        logout() {
+            localStorage.removeItem("user-token");
+            localStorage.removeItem("current-user");
+            this.$router.push("/");
+        },
+    },
+    computed: {
+        open: {
+            get: function () {
+                return this.isOpen;
+            },
+            set: function (newValue) {
+                this.$emit("update:isOpen", newValue);
+            },
         },
     },
 };

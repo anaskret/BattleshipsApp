@@ -1,5 +1,5 @@
 <template>
-    <div id="register" class="h-100">
+    <div id="authenticate" class="h-100">
         <div class="container-fluid h-100">
             <div class="row h-100">
                 <div
@@ -34,7 +34,12 @@
                             text-left
                         "
                     >
-                        <Form />
+                        <template v-if="displayRegister">
+                            <RegisterForm />
+                        </template>
+                        <template v-else>
+                            <LoginForm />
+                        </template>
                     </div>
                 </div>
             </div>
@@ -43,24 +48,33 @@
 </template>
 
 <script>
-import Form from "../components/Form.vue";
+import RegisterForm from "../components/RegisterForm.vue";
+import LoginForm from "../components/LoginForm.vue";
 
 export default {
-    name: "Register",
+    name: "Authenticate",
     components: {
-        Form,
+        RegisterForm,
+        LoginForm,
+    },
+    computed: {
+        displayRegister() {
+            return this.$store.state.displayRegister;
+        },
     },
 };
 </script>
 
 <style>
 #register {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
 }
 .vue-bg {
     background: #1c6f45;
+}
+hr {
+    border-color: #3b556e;
 }
 </style>
