@@ -34,18 +34,25 @@ namespace Battleships.MobileApp.ViewModels.Lobby
 
         private async Task Join()
         {
-            var lobby = await _lobbyService.GetLobbyByName(LobbyName);
-
-            if(lobby.PlayerTwo != null)
+            try
             {
-                PopupHelper.DisplayErrorMessage("Lobby is full", "Failed to Join");
-                return;
+                var lobby = await _lobbyService.GetLobbyByName(LobbyName);
+
+                if(lobby.PlayerTwo != null)
+                {
+                    PopupHelper.DisplayErrorMessage("Lobby is full", "Failed to Join");
+                    return;
+                }
+
+                lobby.PlayerTwo = _settingsService.UserName;
+                await _lobbyService.UpdateLobby(lobby);
+
+                await Shell.Current.GoToAsync($"//{nameof(GamePage)}?LobbyId={lobby.Id}");
             }
-
-            lobby.PlayerTwo = _settingsService.UserName;
-            await _lobbyService.UpdateLobby(lobby);
-
-            await Shell.Current.GoToAsync($"//{nameof(GamePage)}?LobbyId={lobby.Id}");
+            catch(Exception ex)
+            {
+                PopupHelper.DisplayErrorMessage("Lobby wasn't found", "Failed to Join");
+            }
         }
     }
 }
