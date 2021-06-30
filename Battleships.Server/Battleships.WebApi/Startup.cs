@@ -40,12 +40,12 @@ namespace Battleships.WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<AppDbContext>(options =>
-               options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+               options.UseSqlServer(Configuration.GetConnectionString("LocalConnection")));
 
             services.AddControllers();
 
-            services.AddSignalR()
-                    .AddAzureSignalR(Configuration.GetConnectionString("SignalRConnection"));
+            services.AddSignalR();
+                    //.AddAzureSignalR(Configuration.GetConnectionString("SignalRConnection"));
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                             .AddEntityFrameworkStores<AppDbContext>()
